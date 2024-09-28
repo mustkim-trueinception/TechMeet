@@ -37,7 +37,17 @@
 		"webpack-node-externals": "^3.0.0"
 	},
 	"dependencies": {
+		"bcrypt": "^5.1.1",
+		"bcryptjs": "^2.4.3",
+		"color": "^4.2.3",
+		"colors": "^1.4.0",
+		"cors": "^2.8.5",
 		"dotenv": "^16.3.1",
-		"lodash": "^4.17.21"
+		"env": "^0.0.2",
+		"express": "^4.21.0",
+		"jsonwebtoken": "^9.0.2",
+		"lodash": "^4.17.21",
+		"mongoose": "^8.6.3",
+		"zod": "^3.23.8"
 	}
 }
