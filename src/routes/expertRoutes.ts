@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import { authenticateJWT } from '../middleware/auth';
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { ReschedulingRequest } from '../models/requestReschedule'; // Import the Mongoose model
 
 
 const router = express.Router();
@@ -86,5 +87,34 @@ router.delete('/expert/:id', async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 });  
+
+
+
+// GET route to list reschedule requests from guests
+router.get('/reschedule-request', async (req: Request, res: Response) => {
+  try {
+    // Fetch all rescheduling requests without populating the entire document
+    const requests = await ReschedulingRequest.find();
+
+    // Send the response with only the required fields
+    const formattedRequests = requests.map(request => ({
+      currentBookingID: request.Current_Booking_id, 
+      requestedDateId: request.RequestedDateId,
+      requestedSlotId: request.RequestedSlotId, 
+    }));
+
+    res.status(200).json({
+      message: 'Rescheduling requests retrieved successfully',
+      list: formattedRequests,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error', error });
+  }
+});
+
+
+
+
 
 export default router;
