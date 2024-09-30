@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose'
+import { IExpert } from './Expert';
 
 // Request Reschedule by user /guest /client
 
@@ -14,6 +15,7 @@ export interface IReschedulingRequest extends Document {
   // RequestedBy: RequestedBy;
   RequestedDateId: mongoose.Schema.Types.ObjectId; // Foreign key for the requested date
   RequestedSlotId: mongoose.Schema.Types.ObjectId; // Foreign key for the requested slot
+  expertId: IExpert | mongoose.Schema.Types.ObjectId;
 }
 
 // Define the rescheduling request schema
@@ -22,6 +24,7 @@ const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema({
   // RequestedBy: { type: String, enum: Object.values(RequestedBy), required: true },
   RequestedDateId: { type: mongoose.Schema.Types.ObjectId, ref: 'Date', required: true }, // Foreign key to requested date
   RequestedSlotId: { type: mongoose.Schema.Types.ObjectId, ref: 'Slot', required: true }, // Foreign key to requested slot
+  expertId: { type: mongoose.Schema.Types.ObjectId, ref: 'Expert', required: true },
 }, { timestamps: true });
 
 // Create the Mongoose model for rescheduling request

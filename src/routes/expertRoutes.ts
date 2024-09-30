@@ -1,12 +1,12 @@
 // Experts route with jwt authentication
 import express from 'express';
-import { Expert } from '../models/Expert';
+import { Expert, IExpert } from '../models/Expert';
 import { expertSchemaZod } from '../schemas/expertSchema';
 import jwt from 'jsonwebtoken';
 import { authenticateJWT } from '../middleware/auth';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { ReschedulingRequest } from '../models/requestReschedule'; // Import the Mongoose model
+import { ReschedulingRequest, IReschedulingRequest } from '../models/requestReschedule'; // Import the Mongoose model
 
 
 const router = express.Router();
@@ -114,7 +114,118 @@ router.get('/reschedule-request', async (req: Request, res: Response) => {
 });
 
 
+// GET route to list reschedule requests by expert ID
+router.get('/reschedule-request/:expertId', async (req: Request, res: Response) => {
+  const { expertId } = req.params; // Extract expert ID from request parameters
+  console.log(`Expert ID: ${expertId}`);
 
+  try {
+    // Fetch rescheduling requests for the specified expert and populate the expert's name
+    const requests = await ReschedulingRequest.find({ expertId }) // Assuming you have an expertId in ReschedulingRequest schema
+      .populate({
+        path: 'Current_Booking_id', // Populate booking details if needed
+      })
+      .populate({
+        path: 'RequestedDateId', // Populate date details if needed
+      })
+      .populate({
+        path: 'RequestedSlotId', // Populate slot details if needed
+      })
+      .populate({
+        path: 'expertId', // Populate expert to get expert's name
+        select: 'username', // Select only the name field from the expert model
+      });
+
+    // Format the response to include only the required fields
+    const formattedRequests = requests.map(request => ({
+      currentBookingID: request.Current_Booking_id, // You might want to extract only the ID or relevant fields here
+      requestedDateId: request.RequestedDateId, // Same as above
+      requestedSlotId: request.RequestedSlotId, // Same as above
+      expertName: (request.expertId as IExpert)?.username || null, // Include expert's name; handle cases where expertId might not exist
+    }));
+
+    res.status(200).json({
+      message: 'Rescheduling requests retrieved successfully',
+      data: formattedRequests,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error', error });
+  }
+});
+
+
+
+
+// GET route to list all reschedule requests with expert name
+router.get('/reschedule-requests', async (req: Request, res: Response) => {
+  try {
+    // Fetch all rescheduling requests and populate the expert's username
+    const requests = await ReschedulingRequest.find()
+      .populate({
+        path: 'expertId',
+        select: 'username', // Only select the username field from the Expert model
+      })
+      .populate('Current_Booking_id') // Populate booking details if needed
+      .populate('RequestedDateId') // Populate date details if needed
+      .populate('RequestedSlotId'); // Populate slot details if needed
+
+    // Format the response to include only the required fields
+    const formattedRequests = requests.map(request => {
+      const expert = request.expertId as IExpert | null; // Type assertion for populated expert
+
+      return {
+        currentBookingID: request.Current_Booking_id, // Include the relevant fields you need
+        requestedDateId: request.RequestedDateId,
+        requestedSlotId: request.RequestedSlotId,
+        expertName: expert?.username || null, // Include expert's username if expert is populated
+      };
+    });
+
+    res.status(200).json({
+      message: 'Rescheduling requests retrieved successfully',
+      data: formattedRequests,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
+
+
+// GET route to list all reschedule requests with expert name
+// router.get('/reschedule-requests', async (req: Request, res: Response) => {
+//   try {
+//     // Fetch all rescheduling requests and populate the expert's username
+//     const requests = await ReschedulingRequest.find()
+//       .populate('expertId') // Populate expert details if needed)
+//       .populate('Current_Booking_id') // Populate booking details if needed
+//       .populate('RequestedDateId') // Populate date details if needed
+//       .populate('RequestedSlotId'); // Populate slot details if needed
+
+//     // Format the response to include only the required fields
+//     const formattedRequests = requests.map(request => {
+//       const expert = request.expertId as IExpert; // Type assertion to IExpert
+
+//       return {
+//         currentBookingID: request.Current_Booking_id, // Include the relevant fields you need
+//         requestedDateId: request.RequestedDateId,
+//         requestedSlotId: request.RequestedSlotId,
+//         expertName: expert?.username || null, // Ensure expert is populated, else set as null
+//       };
+//     });
+
+//     res.status(200).json({
+//       message: 'Rescheduling requests retrieved successfully',
+//       data: formattedRequests,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Internal server error', error: error.message });
+//   }
+// });
 
 
 export default router;

@@ -8,4 +8,5 @@ export const reschedulingRequestSchemaZod = z.object({
   // RequestedBy: z.enum([RequestedBy.USER, RequestedBy.EXPERT]),
   RequestedDateId: z.string().length(24, "Invalid date ID format"), // Must be a valid ObjectId
   RequestedSlotId: z.string().length(24, "Invalid slots ID format"),  // Must be a valid ObjectId
+  expertId: z.string().length(24, "Invalid expert ID format"),  // Must be a valid ObjectId
 });
