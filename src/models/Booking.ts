@@ -36,7 +36,7 @@ export interface IBooking extends Document {
 }
 
 // Define the Mongoose schema for booking
-const bookingSchema: Schema = new Schema({
+  const bookingSchema: Schema = new Schema({
   guestName: { type: String, required: true },
   dateId:{ type: Schema.Types.ObjectId, ref: 'Date', required: true },  // Reference to Date model,
   guestOccupation: { type: String, enum: Object.values(GuestOccupation), required: true },

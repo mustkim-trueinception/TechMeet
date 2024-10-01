@@ -10,7 +10,7 @@ import express from 'express';
 const router = express.Router();
 
 // Define the routes for the plans
-router.post('/create', async (req: Request, res: Response) => {
+router.post('/plan/create', async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod
     const parsedData = planSchemaZod.parse(req.body);
@@ -28,7 +28,7 @@ router.post('/create', async (req: Request, res: Response) => {
   }
 });           // Create a new plan
 
-router.get('/get', async (req: Request, res: Response) => {
+router.get('/plans/get', async (req: Request, res: Response) => {
   try {
     const plans = await Plan.find();
     res.status(200).json(plans);
@@ -38,7 +38,7 @@ router.get('/get', async (req: Request, res: Response) => {
 });              // Get all plans
 
 //router.get('/:id', getPlanById);        // Get a plan by ID
-router.get('/:expert_id', async (req: Request, res: Response) => {
+router.get('/plan/:expert_id', async (req: Request, res: Response) => {
   try {
     const plans = await Plan.find({ expertId: req.params.expert_id });
     if (!plans || plans.length === 0) {

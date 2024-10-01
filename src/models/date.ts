@@ -1,3 +1,4 @@
+import { populate } from 'dotenv';
 import mongoose, { Document, Schema } from 'mongoose';
 
 enum Availability {
