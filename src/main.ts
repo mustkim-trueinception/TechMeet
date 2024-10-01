@@ -21,9 +21,8 @@ dotenv.config(); // Load environment variables
 
 // import routes
 
-app.use('/api/v1/', expertRoute);
+app.use('/api/v1', expertRoute);
 app.use('/api/v1/admin', adminRoute);
-// Use the routes
 app.use('/api/v1/plans', planRoutes);
 app.use('/api/v1', SlotsRoutes);
 app.use('/api/v1', dateRoutes);

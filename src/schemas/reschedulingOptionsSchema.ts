@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Zod validation schema for rescheduling options
 export const reschedulingOptionsSchemaZod = z.object({
-  currentBookingId: z.string().nonempty('Current booking ID is required'),
+  CurrentBookingId: z.string().nonempty('Current booking ID is required'),
   availableSlots: z.array(
     z.object({
       dateId: z.string().nonempty('Date is required'),

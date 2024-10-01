@@ -7,7 +7,9 @@ import { authenticateJWT } from '../middleware/auth';
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { ReschedulingRequest, IReschedulingRequest } from '../models/requestReschedule'; // Import the Mongoose model
-
+import { populate } from 'dotenv';
+import mongoose from 'mongoose';
+import { Booking,Status } from '../models/Booking';
 
 const router = express.Router();
 
@@ -90,7 +92,7 @@ router.delete('/expert/:id', async (req: Request, res: Response) => {
 
 
 
-// GET route to list reschedule requests from guests
+// GET route to list reschedule requests from guests (35:  working code)
 router.get('/reschedule-request', async (req: Request, res: Response) => {
   try {
     // Fetch all rescheduling requests without populating the entire document
@@ -98,7 +100,7 @@ router.get('/reschedule-request', async (req: Request, res: Response) => {
 
     // Send the response with only the required fields
     const formattedRequests = requests.map(request => ({
-      currentBookingID: request.Current_Booking_id, 
+      currentBookingID: request.CurrentBookingId, 
       requestedDateId: request.RequestedDateId,
       requestedSlotId: request.RequestedSlotId, 
     }));
@@ -114,118 +116,139 @@ router.get('/reschedule-request', async (req: Request, res: Response) => {
 });
 
 
-// GET route to list reschedule requests by expert ID
-router.get('/reschedule-request/:expertId', async (req: Request, res: Response) => {
-  const { expertId } = req.params; // Extract expert ID from request parameters
-  console.log(`Expert ID: ${expertId}`);
+
+// GET route to list reschedule requests by expert ID ( 34: only for admin orking code)
+router.get('/reschedule-requests/:ExpertId', async (req: Request, res: Response) => {
+  const { ExpertId } = req.params; // Extract expert ID from request parameters
+  console.log(`Expert ID: ${ExpertId}`);
 
   try {
-    // Fetch rescheduling requests for the specified expert and populate the expert's name
-    const requests = await ReschedulingRequest.find({ expertId }) // Assuming you have an expertId in ReschedulingRequest schema
+    // Check if the expert exists in the database
+    const expert = await Expert.findById(ExpertId).select('username'); // Only select the username field
+    if (!expert) {
+      return res.status(404).json({ message: 'Expert not found' });
+    }
+
+    // Fetch rescheduling requests associated with the specified expert ID
+    const requests = await ReschedulingRequest.find({ expertId: ExpertId }) // Ensure the expertId field exists in ReschedulingRequest schema
+      .populate('Current_Booking_id') // Populate booking details if needed
+      .populate('RequestedDateId') // Populate date details if needed
+      .populate('RequestedSlotId'); // Populate slot details if needed
+
+    // If no requests are found
+    if (requests.length === 0) {
+      return res.status(404).json({ message: 'No reschedule requests found for this expert' });
+    }
+
+    // Format the response to include the necessary fields
+    const formattedRequests = requests.map(request => ({
+      currentBookingID: request.CurrentBookingId, // Include the booking ID or details
+      requestedDateId: request.RequestedDateId, // Include the requested date
+      requestedSlotId: request.RequestedSlotId, // Include the requested slot
+      expertName: expert.username // Include the expert's username
+    }));
+
+    // Send the response
+    res.status(200).json({
+      message: 'Rescheduling requests retrieved successfully',
+      list: formattedRequests, // Return the formatted requests
+    });
+
+  } catch (error) {
+    console.error('Error fetching reschedule requests:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
+
+// GET route to list all reschedule requests (for admin)
+router.get('/reschedule-requests', async (req: Request, res: Response) => {
+  try {
+    // Fetch all rescheduling requests and populate the expert's username
+    const requests = await ReschedulingRequest.find()
       .populate({
-        path: 'Current_Booking_id', // Populate booking details if needed
+        path: 'Current_Booking_id',
+        populate: {
+          path: 'expertId',
+          model: 'Expert',
+          select: 'username',
+        },
       })
       .populate({
         path: 'RequestedDateId', // Populate date details if needed
       })
       .populate({
         path: 'RequestedSlotId', // Populate slot details if needed
-      })
-      .populate({
-        path: 'expertId', // Populate expert to get expert's name
-        select: 'username', // Select only the name field from the expert model
       });
+console.log(requests);
 
     // Format the response to include only the required fields
     const formattedRequests = requests.map(request => ({
-      currentBookingID: request.Current_Booking_id, // You might want to extract only the ID or relevant fields here
-      requestedDateId: request.RequestedDateId, // Same as above
-      requestedSlotId: request.RequestedSlotId, // Same as above
-      expertName: (request.expertId as IExpert)?.username || null, // Include expert's name; handle cases where expertId might not exist
+      currentBookingID: request.CurrentBookingId, // Include the relevant fields
+      requestedDateId: request.RequestedDateId,
+      requestedSlotId: request.RequestedSlotId,
+      // expertName: request.Current_Booking_id?.expertId?.username || null, // Use optional chaining and default to null
     }));
 
     res.status(200).json({
       message: 'Rescheduling requests retrieved successfully',
-      data: formattedRequests,
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal server error', error });
-  }
-});
-
-
-
-
-// GET route to list all reschedule requests with expert name
-router.get('/reschedule-requests', async (req: Request, res: Response) => {
-  try {
-    // Fetch all rescheduling requests and populate the expert's username
-    const requests = await ReschedulingRequest.find()
-      .populate({
-        path: 'expertId',
-        select: 'username', // Only select the username field from the Expert model
-      })
-      .populate('Current_Booking_id') // Populate booking details if needed
-      .populate('RequestedDateId') // Populate date details if needed
-      .populate('RequestedSlotId'); // Populate slot details if needed
-
-    // Format the response to include only the required fields
-    const formattedRequests = requests.map(request => {
-      const expert = request.expertId as IExpert | null; // Type assertion for populated expert
-
-      return {
-        currentBookingID: request.Current_Booking_id, // Include the relevant fields you need
-        requestedDateId: request.RequestedDateId,
-        requestedSlotId: request.RequestedSlotId,
-        expertName: expert?.username || null, // Include expert's username if expert is populated
-      };
-    });
-
-    res.status(200).json({
-      message: 'Rescheduling requests retrieved successfully',
-      data: formattedRequests,
+      list: formattedRequests, // Return the formatted data
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching reschedule requests:', error);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 });
 
 
+// Handle-Reschedule Requests
+// POST route to handle expert reschedule requests
+router.post('/handle-Reschedule', async (req: Request, res: Response) => {
+  const { CurrentBookingId, RequestedDateId, RequestedSlotId, action, newDate } = req.body;
 
-// GET route to list all reschedule requests with expert name
-// router.get('/reschedule-requests', async (req: Request, res: Response) => {
-//   try {
-//     // Fetch all rescheduling requests and populate the expert's username
-//     const requests = await ReschedulingRequest.find()
-//       .populate('expertId') // Populate expert details if needed)
-//       .populate('Current_Booking_id') // Populate booking details if needed
-//       .populate('RequestedDateId') // Populate date details if needed
-//       .populate('RequestedSlotId'); // Populate slot details if needed
+  try {
+    // Check if the booking exists
+    const booking = await Booking.findById(CurrentBookingId);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
 
-//     // Format the response to include only the required fields
-//     const formattedRequests = requests.map(request => {
-//       const expert = request.expertId as IExpert; // Type assertion to IExpert
+    if (action === 'accepted') {
+      // Validate the requestedDateId and requestedSlotId
+      if (!mongoose.Types.ObjectId.isValid(RequestedDateId) || !mongoose.Types.ObjectId.isValid(RequestedSlotId)) {
+        return res.status(400).json({ message: 'Invalid date or slot ID' });
+      }
 
-//       return {
-//         currentBookingID: request.Current_Booking_id, // Include the relevant fields you need
-//         requestedDateId: request.RequestedDateId,
-//         requestedSlotId: request.RequestedSlotId,
-//         expertName: expert?.username || null, // Ensure expert is populated, else set as null
-//       };
-//     });
+      // Update the booking with new date and slot
+      booking.dateId = RequestedDateId;
+      booking.slotId = RequestedSlotId;
+      booking.status = Status.RESCHEDULED; // Update the status using the enum
 
-//     res.status(200).json({
-//       message: 'Rescheduling requests retrieved successfully',
-//       data: formattedRequests,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Internal server error', error: error.message });
-//   }
-// });
+      await booking.save();
+
+      // Optionally, delete the rescheduling request if it was accepted
+      await ReschedulingRequest.deleteOne({ CurrentBookingId: CurrentBookingId });
+
+      return res.status(200).json({
+        message: 'Reschedule request accepted successfully',
+        booking,
+      });
+    } else if (action === 'rejected') {
+      // Optionally, delete the rescheduling request if it was rejected
+      await ReschedulingRequest.deleteOne({ CurrentBookingId: CurrentBookingId });
+
+      return res.status(200).json({
+        message: 'Reschedule request rejected successfully',
+      });
+    } else {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+  } catch (error) {
+    console.error('Error handling reschedule request:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
 
 
 export default router;
