@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Define the routes for slots
  // Create a new slot
-router.post('/slot',async (req: Request, res: Response) => {
+router.post('/slot/create',async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod
     const parsedData = slotSchemaZod.parse(req.body);
@@ -37,9 +37,10 @@ router.get('/slots', async (req: Request, res: Response) => {
 }); 
 
  // Get a slot by ID
-router.get('/slot:id', async (req: Request, res: Response) => {
+router.get('/slot/:expert_Id', async (req: Request, res: Response) => {
   try {
-    const slot = await Slot.findById(req.params.id);
+    console.log(req.params.expert_Id);
+    const slot = await Slot.find({expertId:req.params.expert_Id});
     if (!slot) {
       return res.status(404).json({ error: 'Slot not found' });
     }

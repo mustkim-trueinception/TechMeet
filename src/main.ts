@@ -12,6 +12,7 @@ import SlotsRoutes from './routes/slotsroute'
 import dateRoutes from './routes/dateroute'
 import bookingRoutes from './routes/bookingroutes'
 import requestRescheduleRoute from './routes/requestRescheduleRoute'
+import adminexpertRoute from './routes/adminexpertsroutes'
 
 
 const app = express()
@@ -22,11 +23,11 @@ dotenv.config(); // Load environment variables
 
 app.use('/api/v1/', expertRoute);
 app.use('/api/v1/admin', adminRoute);
-// Use the routes
-app.use('/api/v1/plans', planRoutes);
+app.use('/api/v1', planRoutes);
 app.use('/api/v1', SlotsRoutes);
 app.use('/api/v1', dateRoutes);
 app.use('/api/v1', bookingRoutes);
+app.use('/api/v1', adminexpertRoute);
 app.use('/api/v1/booking', requestRescheduleRoute);
 
 const connectDb = async (): Promise<void> => {
@@ -36,7 +37,7 @@ const connectDb = async (): Promise<void> => {
 
         await mongoose.connect(mongoUrl);
 
-        console.log(`MongoDB Connected: ${mongoose.connection.host}`.cyan.underline.bold);
+        console.log(`MongoDB Connected  ✅: ${mongoose.connection.host}`.cyan.underline.bold);
     } catch (error) {
         console.log(`Error: ${(error as Error).message}`.red.underline.bold);
         process.exit(1);
