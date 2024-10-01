@@ -16,6 +16,7 @@ router.post('/reschedule', async (req: Request, res: Response) => {
       Current_Booking_id: validatedData.Current_Booking_id,
       RequestedDateId: validatedData.RequestedDateId,
       RequestedSlotId: validatedData.RequestedSlotId,
+      // ExpertId: validatedData.expertId,
     });
 
     // Save the rescheduling request to the database

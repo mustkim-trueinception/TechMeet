@@ -13,6 +13,7 @@ import dateRoutes from './routes/dateroute'
 import bookingRoutes from './routes/bookingroutes'
 import requestRescheduleRoute from './routes/requestRescheduleRoute'
 import adminexpertRoute from './routes/adminexpertsroutes'
+import reschedulingOptionsRoute  from './routes/reschedulingOptionsRoute'
 
 
 const app = express()
@@ -21,7 +22,7 @@ dotenv.config(); // Load environment variables
 
 // import routes
 
-app.use('/api/v1/', expertRoute);
+app.use('/api/v1', expertRoute);
 app.use('/api/v1/admin', adminRoute);
 app.use('/api/v1', planRoutes);
 app.use('/api/v1', SlotsRoutes);
@@ -29,6 +30,7 @@ app.use('/api/v1', dateRoutes);
 app.use('/api/v1', bookingRoutes);
 app.use('/api/v1', adminexpertRoute);
 app.use('/api/v1/booking', requestRescheduleRoute);
+app.use('/api/v1', reschedulingOptionsRoute);
 
 const connectDb = async (): Promise<void> => {
     try {

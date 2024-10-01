@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 // Define Zod enum for Guest Occupation
-const GuestOccupationEnum = z.enum([
+export const GuestOccupationEnum = z.enum([
   'Student',
   'Businessperson',
   'Working Professional'
 ]);
 
 // Define Zod enum for Status
-const StatusEnum = z.enum([
+export const StatusEnum = z.enum([
   'Pending',
   'Completed',
   'Cancelled',

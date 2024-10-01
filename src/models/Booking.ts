@@ -8,7 +8,7 @@ enum GuestOccupation {
 }
 
 // Define enum for status
-enum Status {
+export enum Status {
   PENDING = 'Pending',
   COMPLETED = 'Completed',
   CANCELLED = 'Cancelled',
