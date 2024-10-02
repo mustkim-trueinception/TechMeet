@@ -174,6 +174,7 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
     const requests = await ReschedulingRequest.find()
       .populate({
         path: "CurrentBookingId",
+        select: "_Id",
         populate: {
           path: "expertId",
           model: "Expert",
@@ -181,10 +182,12 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
         },
       })
       .populate({
-        path: "RequestedDateId", // Populate date details if needed
+        path: "RequestedDateId",
+        select: "date", // Populate date details if needed
       })
       .populate({
-        path: "RequestedSlotId", // Populate slot details if needed
+        path: "RequestedSlotId",
+        select: "_Id", // Populate slot details if needed
       });
     console.log(requests);
 
@@ -193,7 +196,6 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
       currentBookingId: request.CurrentBookingId, // Include the relevant fields
       requestedDateId: request.RequestedDateId,
       requestedSlotId: request.RequestedSlotId,
-      expertName: request.CurrentBookingId?.expertId?.username || null, // Use optional chaining and default to null
     }));
 
     res.status(200).json({
