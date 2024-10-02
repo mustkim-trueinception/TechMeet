@@ -11,6 +11,17 @@ router.post("/reschedule", async (req: Request, res: Response) => {
     // Validate request body with Zod schema
     const validatedData = ReschedulingRequestSchemaZod.parse(req.body);
 
+    // Check if the rescheduling request already exists
+    const reschedulingRequestExists = await ReschedulingRequest.findOne({
+      CurrentBookingId: validatedData.CurrentBookingId,
+      RequestedDateId: validatedData.RequestedDateId,
+      RequestedSlotId: validatedData.RequestedSlotId,
+    });
+    if (reschedulingRequestExists) {
+      return res.status(400).json({
+        message: "Rescheduling request already exists",
+      });
+    }
     // Create a new rescheduling request
     const newReschedulingRequest = new ReschedulingRequest({
       CurrentBookingId: validatedData.CurrentBookingId,

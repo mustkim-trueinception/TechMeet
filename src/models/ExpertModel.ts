@@ -1,7 +1,6 @@
 // models/expert.model.ts
 
 import mongoose, { Document, Schema } from "mongoose";
-import { array } from "zod";
 
 export interface IExpert extends Document {
   username: string;

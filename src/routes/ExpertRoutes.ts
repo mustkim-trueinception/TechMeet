@@ -103,14 +103,14 @@ router.get("/reschedule-request", async (req: Request, res: Response) => {
 
     // Send the response with only the required fields
     const formattedRequests = requests.map((request) => ({
-      currentBookingID: request.CurrentBookingId,
+      currentBookingId: request.CurrentBookingId,
       requestedDateId: request.RequestedDateId,
       requestedSlotId: request.RequestedSlotId,
     }));
 
     res.status(200).json({
       message: "Rescheduling requests retrieved successfully",
-      list: formattedRequests,
+      list: requests,
     });
   } catch (error) {
     console.error(error);
@@ -134,7 +134,7 @@ router.get(
 
       // Fetch rescheduling requests associated with the specified expert ID
       const requests = await ReschedulingRequest.find({ expertId: ExpertId }) // Ensure the expertId field exists in ReschedulingRequest schema
-        .populate("Current_Booking_id") // Populate booking details if needed
+        .populate("CurrentBookingId") // Populate booking details if needed
         .populate("RequestedDateId") // Populate date details if needed
         .populate("RequestedSlotId"); // Populate slot details if needed
 
@@ -147,7 +147,7 @@ router.get(
 
       // Format the response to include the necessary fields
       const formattedRequests = requests.map((request) => ({
-        currentBookingID: request.CurrentBookingId, // Include the booking ID or details
+        currentBookingId: request.CurrentBookingId, // Include the booking ID or details
         requestedDateId: request.RequestedDateId, // Include the requested date
         requestedSlotId: request.RequestedSlotId, // Include the requested slot
         expertName: expert.username, // Include the expert's username
@@ -173,7 +173,7 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
     // Fetch all rescheduling requests and populate the expert's username
     const requests = await ReschedulingRequest.find()
       .populate({
-        path: "Current_Booking_id",
+        path: "CurrentBookingId",
         populate: {
           path: "expertId",
           model: "Expert",
@@ -190,10 +190,10 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
 
     // Format the response to include only the required fields
     const formattedRequests = requests.map((request) => ({
-      currentBookingID: request.CurrentBookingId, // Include the relevant fields
+      currentBookingId: request.CurrentBookingId, // Include the relevant fields
       requestedDateId: request.RequestedDateId,
       requestedSlotId: request.RequestedSlotId,
-      // expertName: request.Current_Booking_id?.expertId?.username || null, // Use optional chaining and default to null
+      expertName: request.CurrentBookingId?.expertId?.username || null, // Use optional chaining and default to null
     }));
 
     res.status(200).json({
