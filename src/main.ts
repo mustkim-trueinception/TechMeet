@@ -1,19 +1,19 @@
-import { Slot } from './models/slotmodel';
+import { Slot } from './models/SlotModel';
 import * as _ from 'lodash'
 import express from 'express'
 import mongoose, { isObjectIdOrHexString } from 'mongoose'
 import { union } from 'lodash'
 import 'colors'; // Import colors to extend string prototypes
 import dotenv from 'dotenv';
-import expertRoute from './routes/expertRoutes'
-import adminRoute from './routes/admin'
-import planRoutes from './routes/planroutes'
-import SlotsRoutes from './routes/slotsroute'
-import dateRoutes from './routes/dateroute'
-import bookingRoutes from './routes/bookingroutes'
-import requestRescheduleRoute from './routes/requestRescheduleRoute'
-import adminexpertRoute from './routes/adminexpertsroutes'
-import reschedulingOptionsRoute  from './routes/reschedulingOptionsRoute'
+import expertRoute from './routes/ExpertRoutes'
+import adminRoute from './routes/AdminRoutes'
+import planRoutes from './routes/PlanRoutes'
+import SlotsRoutes from './routes/SlotsRoutes'
+import dateRoutes from './routes/DateRoutes'
+import bookingRoutes from './routes/BookingRoutes'
+import requestRescheduleRoute from './routes/RequestRescheduleRoutes'
+import adminexpertRoute from './routes/AdminExpertRoutes'
+import reschedulingOptionsRoute  from './routes/ReschedulingOptionsRoutes'
 
 
 const app = express()

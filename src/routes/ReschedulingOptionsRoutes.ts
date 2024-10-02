@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { ReschedulingOptions } from '../models/ReschedulingOptions';
-import { reschedulingOptionsSchemaZod } from '../schemas/reschedulingOptionsSchema'; // Import Zod validation schema
+import { ReschedulingOptions } from '../models/ReschedulingOptionsModel';
+import { ReschedulingOptionsSchemaZod } from '../schemas/ReschedulingOptionsSchema'; // Import Zod validation schema
 import { z } from 'zod';
 
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/reschedule-options', async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
-    const validatedData = reschedulingOptionsSchemaZod.parse(req.body);
+    const validatedData = ReschedulingOptionsSchemaZod.parse(req.body);
 
     // Create a new rescheduling options entry
     const newReschedulingOptions = new ReschedulingOptions({

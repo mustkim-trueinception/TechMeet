@@ -1,6 +1,6 @@
+import { BookingSchemaZod } from '../schemas/BookingSchema';
 import express, { Request, Response } from 'express';
-import { bookingSchema } from '../schemas/bookingSchema'; // Import Booking Zod schema
-import { Booking } from '../models/Booking'; // Import Mongoose Booking model
+import { BookingSchema, IBooking } from '../models/BookingModel'; // Import Mongoose Booking model
 import { date, z } from 'zod';
 
 const router = express.Router();
@@ -9,10 +9,10 @@ const router = express.Router();
 router.post('/book-appointment', async (req: Request, res: Response) => {
   try {
     // Validate request body with Zod schema
-    const validatedData = bookingSchema.parse(req.body);
+    const validatedData = BookingSchemaZod.parse(req.body);
 
     // Create new Booking with validated data
-    const newBooking = new Booking({
+    const newBooking = new BookingSchema({
       guestName: validatedData.guestName,
       dateId: validatedData.dateId,
       guestOccupation: validatedData.guestOccupation,
@@ -81,7 +81,7 @@ router.put('/booking/modify', async (req: Request, res: Response) => {
     const validatedData = updateGuestSchema.parse(req.body);
 
     // Find the booking by ID and update guest data
-    const updatedBooking = await Booking.findByIdAndUpdate(validatedData.booking_id,
+    const updatedBooking = await BookingSchema.findByIdAndUpdate(validatedData.booking_id,
       {
         $set: {
           guestPhone: validatedData.guestPhone,

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
-import { reschedulingRequestSchemaZod } from '../schemas/requestReschedule'; // Import Zod schema
-import { ReschedulingRequest } from '../models/requestReschedule'; // Import Mongoose model
+import { ReschedulingRequestSchemaZod } from '../schemas/RequestRescheduleSchema'; // Import Zod schema
+import { ReschedulingRequest } from '../models/RequestRescheduleModel'; // Import Mongoose model
 import { z } from 'zod';
 
 const router = express.Router();
@@ -9,11 +9,11 @@ const router = express.Router();
 router.post('/reschedule', async (req: Request, res: Response) => {
   try {
     // Validate request body with Zod schema
-    const validatedData = reschedulingRequestSchemaZod.parse(req.body);
+    const validatedData = ReschedulingRequestSchemaZod.parse(req.body);
 
     // Create a new rescheduling request
     const newReschedulingRequest = new ReschedulingRequest({
-      Current_Booking_id: validatedData.Current_Booking_id,
+      CurrentBookingId: validatedData.CurrentBookingId,
       RequestedDateId: validatedData.RequestedDateId,
       RequestedSlotId: validatedData.RequestedSlotId,
       // ExpertId: validatedData.expertId,

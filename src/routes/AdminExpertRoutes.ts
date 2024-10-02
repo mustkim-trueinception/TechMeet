@@ -1,5 +1,5 @@
+import { BookingSchema } from '../models/BookingModel';
 import express, { Request, Response } from 'express';
-import { Booking } from '../models/Booking';  // Import Mongoose Booking model
 import { any, array, string } from 'zod';
 
 const router = express.Router();
@@ -53,14 +53,14 @@ router.get('/booking', async (req: Request, res: Response) => {
       };
   
       // Execute the query with pagination and sorting
-      const bookings = await Booking.find(query)
+      const bookings = await BookingSchema.find(query)
         .populate('expertId')    // Populate expertId with full expert details if needed
         .sort(sortBy)            // Sort the results
         .skip(page * limit)      // Pagination
         .limit(limit);           // Limit results per page
   
       // Get total count for pagination
-      const total = await Booking.countDocuments(query);
+      const total = await BookingSchema.countDocuments(query);
   
       // Response object
       const response = {
@@ -88,7 +88,7 @@ router.get('/booking', async (req: Request, res: Response) => {
    // Get a date entry by ID
 router.get('/Booking/:UID', async (req: Request, res: Response) => {
     try {
-      const dateEntry = await Booking.findById(req.params.UID);
+      const dateEntry = await BookingSchema.findById(req.params.UID);
       if (!dateEntry) {
         return res.status(404).json({ error: 'Date entry not found' });
       }

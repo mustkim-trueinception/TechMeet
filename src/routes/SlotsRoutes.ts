@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { Slot } from '../models/slotmodel';
-import { slotSchemaZod } from '../schemas/slotSchema';  // Import the Zod schema
+import { Slot } from '../models/SlotModel';
+import { SlotSchemaZod } from '../schemas/SlotSchema';  // Import the Zod schema
 import { z } from 'zod';
 import express from 'express';
 
@@ -11,7 +11,7 @@ const router = express.Router();
 router.post('/slot/create',async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod
-    const parsedData = slotSchemaZod.parse(req.body);
+    const parsedData = SlotSchemaZod.parse(req.body);
 
     const slot = new Slot(parsedData);
     await slot.save();
@@ -54,7 +54,7 @@ router.get('/slot/:expert_Id', async (req: Request, res: Response) => {
 router.put('/slot:id',async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod
-    const parsedData = slotSchemaZod.partial().parse(req.body);  // Allow partial updates
+    const parsedData = SlotSchemaZod.partial().parse(req.body);  // Allow partial updates
 
     const slot = await Slot.findByIdAndUpdate(req.params.id, parsedData, { new: true });
     if (!slot) {

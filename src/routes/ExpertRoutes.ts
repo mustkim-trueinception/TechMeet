@@ -1,15 +1,15 @@
 // Experts route with jwt authentication
 import express from 'express';
-import { Expert, IExpert } from '../models/Expert';
-import { expertSchemaZod } from '../schemas/expertSchema';
+import { Expert, IExpert } from '../models/ExpertModel';
+import { ExpertSchemaZod } from '../schemas/ExpertSchema';
 import jwt from 'jsonwebtoken';
 import { authenticateJWT } from '../middleware/auth';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { ReschedulingRequest, IReschedulingRequest } from '../models/requestReschedule'; // Import the Mongoose model
+import { ReschedulingRequest, IReschedulingRequest } from '../models/RequestRescheduleModel'; // Import the Mongoose model
 import { populate } from 'dotenv';
 import mongoose from 'mongoose';
-import { Booking,Status } from '../models/Booking';
+import { BookingSchema,Status } from '../models/BookingModel';
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ const router = express.Router();
 router.post('/expert/create', async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
-    const parsedData = expertSchemaZod.parse(req.body);
+    const parsedData = ExpertSchemaZod.parse(req.body);
 
     const expert = new Expert(parsedData);
     await expert.save();
@@ -60,7 +60,7 @@ router.get('/expert/:id',async (req: Request, res: Response) => {
 router.put('/expert/:id', async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
-    const parsedData = expertSchemaZod.partial().parse(req.body); // Allow partial updates
+    const parsedData = ExpertSchemaZod.partial().parse(req.body); // Allow partial updates
 
     const expert = await Expert.findByIdAndUpdate(req.params.id, parsedData, { new: true });
     if (!expert) {
@@ -208,7 +208,7 @@ router.post('/handle-Reschedule', async (req: Request, res: Response) => {
 
   try {
     // Check if the booking exists
-    const booking = await Booking.findById(CurrentBookingId);
+    const booking = await BookingSchema.findById(CurrentBookingId);
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
     }

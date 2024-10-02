@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose'
-import { IExpert } from './Expert';
+import { IExpert } from './ExpertModel';
 
 // Request Reschedule by user /guest /client
 

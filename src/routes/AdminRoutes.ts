@@ -1,9 +1,10 @@
+import { SignupSchemaZod, LoginSchemaZod } from './../schemas/AdminSchema';
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import Admin from '../models/Admin';
-import { signupSchema ,loginSchema} from '../schemas/adminSchema';
+import AdminSchema from '../models/AdminModel';
+
 
 
 
@@ -13,12 +14,12 @@ const router = express.Router();
 router.post('/signup', async (req: Request, res: Response) => {
     try {
         // Validate the request body with Zod
-        const validatedData = signupSchema.parse(req.body);
+        const validatedData = SignupSchemaZod.parse(req.body);
 
         const { name, email, password } = validatedData;
 
         // Check if the admin already exists
-        const adminExists = await Admin.findOne({ email });
+        const adminExists = await AdminSchema.findOne({ email });
         if (adminExists) {
             return res.status(400).json({ message: "Admin already exists" });
         }
@@ -27,7 +28,7 @@ router.post('/signup', async (req: Request, res: Response) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create a new admin
-        const admin = await Admin.create({
+        const admin = await AdminSchema.create({
             name,
             email,
             password: hashedPassword
@@ -51,12 +52,12 @@ router.post('/signup', async (req: Request, res: Response) => {
 router.post('/login', async (req: Request, res: Response) => {
     try {
         // Validate the request body with Zod
-        const validatedData = loginSchema.parse(req.body);
+        const validatedData = LoginSchemaZod.parse(req.body);
 
         const { email, password } = validatedData;
 
         // Find the admin by email
-        const admin = await Admin.findOne({ email });
+        const admin = await AdminSchema.findOne({ email });
         if (!admin) {
             return res.status(400).json({ message: "Invalid email or password" });
         }

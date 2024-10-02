@@ -16,7 +16,7 @@ export const StatusEnum = z.enum([
 ]);
 
 // Zod schema for validating booking data
-export const bookingSchema = z.object({
+export const BookingSchemaZod = z.object({
   guestName: z.string().min(1, "Guest name is required"),
   dateId: z.string().min(1, "Date is required"),
   guestOccupation: GuestOccupationEnum,

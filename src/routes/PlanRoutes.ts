@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { Plan } from '../models/plansmodel';  // Updated model import path
-import { planSchemaZod } from '../schemas/planSchema';  // Zod validation schema
+import { Plan } from '../models/PlanModel';  // Updated model import path
+import { PlanSchemaZod } from '../schemas/PlanSchema';  // Zod validation schema
 import { z } from 'zod';
 // routes/plan.routes.ts
 
@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/plan/create', async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod
-    const parsedData = planSchemaZod.parse(req.body);
+    const parsedData = PlanSchemaZod.parse(req.body);
 
     const plan = new Plan(parsedData);
     await plan.save();
@@ -53,7 +53,7 @@ router.get('/plan/:expert_id', async (req: Request, res: Response) => {
 router.put('/:id', async (req: Request, res: Response) => {
   try {
     // Validate request data using Zod
-    const parsedData = planSchemaZod.partial().parse(req.body);  // Allow partial updates
+    const parsedData = PlanSchemaZod.partial().parse(req.body);  // Allow partial updates
 
     const plan = await Plan.findByIdAndUpdate(req.params.id, parsedData, { new: true });
     if (!plan) {

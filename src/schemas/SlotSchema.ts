@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Zod schema for slot validation
-export const slotSchemaZod = z.object({
+export const SlotSchemaZod = z.object({
   availability: z.string().min(3, "Availability must be at least 3 characters long"),   // E.g., "Available", "Not available"
   timing: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid time format (HH:MM)"), // Validates time in HH:MM format
   period: z.string().min(3, "Period must be at least 3 characters long"),  // Morning, Afternoon, etc.

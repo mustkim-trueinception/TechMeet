@@ -2,11 +2,11 @@
 
 import express from 'express';
 import { Request, Response } from 'express';
-import { DateModel } from '../models/date';  // Updated import path
-import { dateSchemaZod } from '../schemas/dateSchema';  // Zod validation schema
+import { DateModel } from '../models/DateModel';  // Updated import path
+import { DateSchemaZod } from '../schemas/DateSchema';  // Zod validation schema
 import { z } from 'zod';
-import {Expert} from '../models/Expert'
-import {Plan } from '../models/plansmodel'
+import {Expert} from '../models/ExpertModel'
+import {Plan } from '../models/PlanModel'
 
 
 const router = express.Router();
@@ -17,7 +17,7 @@ const router = express.Router();
 router.post('/date/create', async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod
-    const parsedData = dateSchemaZod.parse(req.body);
+    const parsedData = DateSchemaZod.parse(req.body);
 
     const dateEntry = new DateModel(parsedData);
     await dateEntry.save();
@@ -130,7 +130,7 @@ router.post('/calendar', async (req: Request, res: Response) => {
 router.put('/:id',  async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod (allow partial updates)
-    const parsedData = dateSchemaZod.partial().parse(req.body);
+    const parsedData = DateSchemaZod.partial().parse(req.body);
 
     const dateEntry = await DateModel.findByIdAndUpdate(req.params.id, parsedData, { new: true });
     if (!dateEntry) {

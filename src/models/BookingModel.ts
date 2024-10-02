@@ -1,3 +1,4 @@
+import { BookingSchemaZod } from '../schemas/BookingSchema';
 import mongoose, { Schema, Document } from 'mongoose';
 
 // Define enums for guest occupation
@@ -55,4 +56,4 @@ export interface IBooking extends Document {
   status: { type: String, enum: Object.values(Status), required: true }
 }, { timestamps: true });
 
-export const Booking = mongoose.model<IBooking>('Booking', bookingSchema);
+export const BookingSchema = mongoose.model<IBooking>('Booking', bookingSchema);
