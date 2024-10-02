@@ -5,7 +5,37 @@ import { date, z } from "zod";
 
 const router = express.Router();
 
-// POST route for booking
+/**
+ * @typedef {Object} BookingResponse
+ * @property {string} guestName - Name of the guest.
+ * @property {string} dateId - The ID of the selected date.
+ * @property {("Student" | "Businessperson" | "Working Professional")} guestOccupation - Occupation of the guest.
+ * @property {number} guestAge - Age of the guest.
+ * @property {string} guestCity - City of the guest.
+ * @property {string} guestEmail - Email of the guest.
+ * @property {string} guestPhone - Phone number of the guest.
+ * @property {string} guestWhatsapp - WhatsApp number of the guest.
+ * @property {string} guestWebsite - Website of the guest.
+ * @property {string} guestProblem - Problem or issue reported by the guest.
+ * @property {string | undefined} guestVoiceNotes - Optional voice note from the guest.
+ * @property {Array<string>} tags - Array of tags associated with the booking.
+ * @property {boolean} guestKYC - Indicates if KYC is completed.
+ * @property {string} expertId - MongoDB ObjectId of the expert.
+ * @property {string} slotId - MongoDB ObjectId of the slot.
+ * @property {("Pending" | "Completed" | "Cancelled" | "Rescheduled")} status - Status of the booking.
+ */
+
+/**
+ * POST route for booking an appointment.
+ * 
+ * @route POST /book-appointment
+ * @group Booking - Operations about booking appointments
+ * @param {Object} req - Express request object.
+ * @param {BookingResponse} req.body - The data for booking an appointment.
+ * @returns {Object} 201 - Successfully created booking.
+ * @returns {Object} 400 - Validation error details.
+ * @returns {Object} 500 - Internal server error.
+ */
 router.post("/book-appointment", async (req: Request, res: Response) => {
   try {
     // Validate request body with Zod schema
@@ -61,9 +91,16 @@ router.post("/book-appointment", async (req: Request, res: Response) => {
   }
 });
 
-export default router;
 
-// Zod validation schema for updating guest data
+/**
+ * Zod validation schema for updating guest data.
+ * 
+ * @typedef {Object} UpdateGuestData
+ * @property {string} booking_id - The ID of the booking to update.
+ * @property {string} guestPhone - New phone number of the guest.
+ * @property {string} guestEmail - New email of the guest.
+ * @property {string} guestName - New name of the guest.
+ */
 const updateGuestSchema = z.object({
   booking_id: z.string().nonempty({ message: "Booking ID is required" }),
   guestPhone: z.string().nonempty({ message: "Phone number is required" }),
@@ -71,7 +108,19 @@ const updateGuestSchema = z.object({
   guestName: z.string().nonempty({ message: "Guest name is required" }),
 });
 
-// PUT route to modify guest data
+
+/**
+ * PUT route to modify guest data.
+ * 
+ * @route PUT /booking/modify
+ * @group Booking - Operations about booking appointments
+ * @param {Object} req - Express request object.
+ * @param {UpdateGuestData} req.body - The data for updating guest information.
+ * @returns {Object} 200 - Successfully updated booking data.
+ * @returns {Object} 404 - Booking not found.
+ * @returns {Object} 400 - Validation error details.
+ * @returns {Object} 500 - Internal server error.
+ */
 router.put("/booking/modify", async (req: Request, res: Response) => {
   try {
     // Validate request body using Zod schema
@@ -107,3 +156,5 @@ router.put("/booking/modify", async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error", error });
   }
 });
+
+export default router;
