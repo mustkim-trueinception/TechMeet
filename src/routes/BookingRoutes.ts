@@ -1,12 +1,12 @@
-import { BookingSchemaZod } from '../schemas/BookingSchema';
-import express, { Request, Response } from 'express';
-import { BookingSchema, IBooking } from '../models/BookingModel'; // Import Mongoose Booking model
-import { date, z } from 'zod';
+import { BookingSchemaZod } from "../schemas/BookingSchema";
+import express, { Request, Response } from "express";
+import { BookingSchema, IBooking } from "../models/BookingModel"; // Import Mongoose Booking model
+import { date, z } from "zod";
 
 const router = express.Router();
 
 // POST route for booking
-router.post('/book-appointment', async (req: Request, res: Response) => {
+router.post("/book-appointment", async (req: Request, res: Response) => {
   try {
     // Validate request body with Zod schema
     const validatedData = BookingSchemaZod.parse(req.body);
@@ -57,31 +57,29 @@ router.post('/book-appointment', async (req: Request, res: Response) => {
       // Handle validation errors
       return res.status(400).json({ errors: error.errors });
     }
-    return res.status(500).json({ message: 'Internal server error', error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 });
 
 export default router;
 
-
-
-
 // Zod validation schema for updating guest data
 const updateGuestSchema = z.object({
-  booking_id: z.string().nonempty({ message: 'Booking ID is required' }),
-  guestPhone: z.string().nonempty({ message: 'Phone number is required' }),
-  guestEmail: z.string().email({ message: 'Valid email is required' }),
-  guestName: z.string().nonempty({ message: 'Guest name is required' }),
+  booking_id: z.string().nonempty({ message: "Booking ID is required" }),
+  guestPhone: z.string().nonempty({ message: "Phone number is required" }),
+  guestEmail: z.string().email({ message: "Valid email is required" }),
+  guestName: z.string().nonempty({ message: "Guest name is required" }),
 });
 
 // PUT route to modify guest data
-router.put('/booking/modify', async (req: Request, res: Response) => {
+router.put("/booking/modify", async (req: Request, res: Response) => {
   try {
     // Validate request body using Zod schema
     const validatedData = updateGuestSchema.parse(req.body);
 
     // Find the booking by ID and update guest data
-    const updatedBooking = await BookingSchema.findByIdAndUpdate(validatedData.booking_id,
+    const updatedBooking = await BookingSchema.findByIdAndUpdate(
+      validatedData.booking_id,
       {
         $set: {
           guestPhone: validatedData.guestPhone,
@@ -93,12 +91,12 @@ router.put('/booking/modify', async (req: Request, res: Response) => {
     );
 
     if (!updatedBooking) {
-      return res.status(404).json({ message: 'Booking not found' });
+      return res.status(404).json({ message: "Booking not found" });
     }
 
     // Send a success response with updated booking data
     res.status(200).json({
-      message: 'Guest data updated successfully',
+      message: "Guest data updated successfully",
       updatedBooking,
     });
   } catch (error) {
@@ -106,6 +104,6 @@ router.put('/booking/modify', async (req: Request, res: Response) => {
       // Handle validation errors
       return res.status(400).json({ errors: error.errors });
     }
-    return res.status(500).json({ message: 'Internal server error', error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 });

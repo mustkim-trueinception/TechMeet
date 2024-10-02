@@ -1,5 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose'
-import { IExpert } from './ExpertModel';
+import mongoose, { Schema, Document } from "mongoose";
+import { IExpert } from "./ExpertModel";
 
 // Request Reschedule by user /guest /client
 
@@ -18,14 +18,36 @@ export interface IReschedulingRequest extends Document {
 }
 
 // Define the rescheduling request schema
-const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema({
-  CurrentBookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Booking', required: true },
-  RequestedDateId: { type: mongoose.Schema.Types.ObjectId, ref: 'Date', required: true },
-  RequestedSlotId: { type: mongoose.Schema.Types.ObjectId, ref: 'Slot', required: true },
-  expertId: { type: mongoose.Schema.Types.ObjectId, ref: 'Expert', required: true }
-}, { timestamps: true });
+const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema(
+  {
+    CurrentBookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Booking",
+      required: true,
+    },
+    RequestedDateId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Date",
+      required: true,
+    },
+    RequestedSlotId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Slot",
+      required: true,
+    },
+    expertId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Expert",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
 // Create the Mongoose model for rescheduling request
-const ReschedulingRequest = mongoose.model<IReschedulingRequest>('ReschedulingRequest', reschedulingRequestSchema);
+const ReschedulingRequest = mongoose.model<IReschedulingRequest>(
+  "ReschedulingRequest",
+  reschedulingRequestSchema
+);
 
 export { ReschedulingRequest };

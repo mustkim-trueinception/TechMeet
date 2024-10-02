@@ -1,19 +1,19 @@
-import express, { Request, Response } from 'express';
-import { ReschedulingOptions } from '../models/ReschedulingOptionsModel';
-import { ReschedulingOptionsSchemaZod } from '../schemas/ReschedulingOptionsSchema'; // Import Zod validation schema
-import { z } from 'zod';
+import express, { Request, Response } from "express";
+import { ReschedulingOptions } from "../models/ReschedulingOptionsModel";
+import { ReschedulingOptionsSchemaZod } from "../schemas/ReschedulingOptionsSchema"; // Import Zod validation schema
+import { z } from "zod";
 
 const router = express.Router();
 
 // POST route to create rescheduling options
-router.post('/reschedule-options', async (req: Request, res: Response) => {
+router.post("/reschedule-options", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
     const validatedData = ReschedulingOptionsSchemaZod.parse(req.body);
 
     // Create a new rescheduling options entry
     const newReschedulingOptions = new ReschedulingOptions({
-      currentBookingId: validatedData.currentBookingId,
+      currentBookingId: validatedData.CurrentBookingId,
       availableSlots: validatedData.availableSlots,
       expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24-hour expiry
     });
@@ -23,8 +23,8 @@ router.post('/reschedule-options', async (req: Request, res: Response) => {
 
     // Send response with the new rescheduling options
     res.status(201).json({
-      message: 'Rescheduling options created successfully',
-      currentBookingId: newReschedulingOptions.currentBookingId,
+      message: "Rescheduling options created successfully",
+      currentBookingId: newReschedulingOptions.CurrentBookingId,
       availableSlots: newReschedulingOptions.availableSlots,
       expiryDate: newReschedulingOptions.expiryDate,
     });
@@ -32,7 +32,7 @@ router.post('/reschedule-options', async (req: Request, res: Response) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }
-    return res.status(500).json({ message: 'Internal server error', error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 });
 

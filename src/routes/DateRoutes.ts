@@ -1,20 +1,19 @@
 // routes/date.routes.ts
 
-import express from 'express';
-import { Request, Response } from 'express';
-import { DateModel } from '../models/DateModel';  // Updated import path
-import { DateSchemaZod } from '../schemas/DateSchema';  // Zod validation schema
-import { z } from 'zod';
-import {Expert} from '../models/ExpertModel'
-import {Plan } from '../models/PlanModel'
-
+import express from "express";
+import { Request, Response } from "express";
+import { DateModel } from "../models/DateModel"; // Updated import path
+import { DateSchemaZod } from "../schemas/DateSchema"; // Zod validation schema
+import { z } from "zod";
+import { Expert } from "../models/ExpertModel";
+import { Plan } from "../models/PlanModel";
 
 const router = express.Router();
 
 // Define the routes for dates
 
-        // Create a new date entry
-router.post('/date/create', async (req: Request, res: Response) => {
+// Create a new date entry
+router.post("/date/create", async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod
     const parsedData = DateSchemaZod.parse(req.body);
@@ -30,33 +29,32 @@ router.post('/date/create', async (req: Request, res: Response) => {
       res.status(400).json({ error: error.message });
     }
   }
-}); 
- 
-         // Get all date entries
-router.get('/dates', async (req: Request, res: Response) => {
+});
+
+// Get all date entries
+router.get("/dates", async (req: Request, res: Response) => {
   try {
-    const dates = await DateModel.find().populate('expertId').populate('slots');
+    const dates = await DateModel.find().populate("expertId").populate("slots");
     res.status(200).json(dates);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
- // Get a date entry by ID
-router.get('/date/:expertid', async (req: Request, res: Response) => {
+// Get a date entry by ID
+router.get("/date/:expertid", async (req: Request, res: Response) => {
   try {
-    const dateEntry = await DateModel.find({expertId:req.params.expertid});
+    const dateEntry = await DateModel.find({ expertId: req.params.expertid });
     if (!dateEntry) {
-      return res.status(404).json({ error: 'Date entry not found' });
+      return res.status(404).json({ error: "Date entry not found" });
     }
     res.status(200).json(dateEntry);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});      
+});
 
-
-router.post('/calendar', async (req: Request, res: Response) => {
+router.post("/calendar", async (req: Request, res: Response) => {
   const { plan_id } = req.body;
 
   try {
@@ -64,14 +62,14 @@ router.post('/calendar', async (req: Request, res: Response) => {
     const plan = await Plan.findById(plan_id);
 
     if (!plan) {
-      return res.status(404).json({ message: 'Plan not found' });
+      return res.status(404).json({ message: "Plan not found" });
     }
 
     // 2. Fetch the expert related to the plan
     const expert = await Expert.findById(plan.expertId);
 
     if (!expert) {
-      return res.status(404).json({ message: 'Expert not found' });
+      return res.status(404).json({ message: "Expert not found" });
     }
 
     // 3. Find all dates associated with this plan and expert
@@ -81,7 +79,7 @@ router.post('/calendar', async (req: Request, res: Response) => {
     const responseDates = await Promise.all(
       dates.map(async (date) => {
         // Populate slots using slotsId reference
-        const populatedDate = await date.populate('slotsId'); // Assuming slotsId holds slot references
+        const populatedDate = await date.populate("slotsId"); // Assuming slotsId holds slot references
 
         return {
           id: date._id,
@@ -119,22 +117,26 @@ router.post('/calendar', async (req: Request, res: Response) => {
       dates: responseDates,
     });
   } catch (error) {
-    console.error('Error fetching plan dates and slots:', error);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error fetching plan dates and slots:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 });
 
-
-
-     // Update a date entry by ID
-router.put('/:id',  async (req: Request, res: Response) => {
+// Update a date entry by ID
+router.put("/:id", async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod (allow partial updates)
     const parsedData = DateSchemaZod.partial().parse(req.body);
 
-    const dateEntry = await DateModel.findByIdAndUpdate(req.params.id, parsedData, { new: true });
+    const dateEntry = await DateModel.findByIdAndUpdate(
+      req.params.id,
+      parsedData,
+      { new: true }
+    );
     if (!dateEntry) {
-      return res.status(404).json({ error: 'Date entry not found' });
+      return res.status(404).json({ error: "Date entry not found" });
     }
     res.status(200).json(dateEntry);
   } catch (error) {
@@ -144,19 +146,19 @@ router.put('/:id',  async (req: Request, res: Response) => {
       res.status(400).json({ error: error.message });
     }
   }
-});   
+});
 
- // Delete a date entry by ID
+// Delete a date entry by ID
 
-router.delete('/:date_Id', async (req: Request, res: Response) => {
+router.delete("/:date_Id", async (req: Request, res: Response) => {
   try {
     const dateEntry = await DateModel.findByIdAndDelete(req.params.date_Id);
     if (!dateEntry) {
-      return res.status(404).json({ error: 'Date entry not found' });
+      return res.status(404).json({ error: "Date entry not found" });
     }
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});    
+});
 export default router;
