@@ -5,7 +5,38 @@ import { z } from "zod";
 
 const router = express.Router();
 
-// POST route to create rescheduling options
+/**
+ * @route POST /reschedule-options
+ * @group Rescheduling - Operations about rescheduling options
+ * @param {Object} req.body - Rescheduling options object
+ * @param {string} req.body.CurrentBookingId - The current booking ID.
+ * @param {Array<Object>} req.body.availableSlots - The available rescheduling slots.
+ * @param {string} req.body.availableSlots[].dateId - The ID of the date for the slot.
+ * @param {string} req.body.availableSlots[].slotId - The ID of the available slot.
+ * @returns {Object} 201 - Successfully created rescheduling options
+ * @returns {Object} 400 - Validation errors
+ * @returns {Object} 500 - Internal server error
+ * @example
+ * Example request
+ * POST /reschedule-options
+ * {
+ *   "CurrentBookingId": "603d5b22d2f6e18f88f9a1c4",
+ *   "availableSlots": [
+ *     {
+ *       "dateId": "603d5b22d2f6e18f88f9a1c5",
+ *       "slotId": "603d5b22d2f6e18f88f9a1c6"
+ *     },
+ *     {
+ *       "dateId": "603d5b22d2f6e18f88f9a1c7",
+ *       "slotId": "603d5b22d2f6e18f88f9a1c8"
+ *     },
+ *     {
+ *       "dateId": "603d5b22d2f6e18f88f9a1c9",
+ *       "slotId": "603d5b22d2f6e18f88f9a1ca"
+ *     }
+ *   ]
+ * }
+ */
 router.post("/reschedule-options", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
@@ -17,8 +48,6 @@ router.post("/reschedule-options", async (req: Request, res: Response) => {
       availableSlots: validatedData.availableSlots,
       expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24-hour expiry
     });
-
-    // Save to the database
     await newReschedulingOptions.save();
 
     // Send response with the new rescheduling options
