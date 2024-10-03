@@ -2,13 +2,19 @@ import { Request, Response } from "express";
 import { Plan } from "../models/PlanModel"; // Updated model import path
 import { PlanSchemaZod } from "../schemas/PlanSchema"; // Zod validation schema
 import { z } from "zod";
-// routes/plan.routes.ts
-
 import express from "express";
 
 const router = express.Router();
 
-// Define the routes for the plans
+/**
+ * @route POST /plan/create
+ * @description Create a new plan
+ * @access Public
+ * @param {Request} req - Express request object containing the new plan data in req.body
+ * @param {Response} res - Express response object
+ * @returns {Object} Created plan or validation errors
+ */
+
 router.post("/plan/create", async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod
@@ -25,7 +31,16 @@ router.post("/plan/create", async (req: Request, res: Response) => {
       res.status(400).json({ error: error.message });
     }
   }
-}); // Create a new plan
+});
+
+/**
+ * @route GET /plans/get
+ * @description Get all plans
+ * @access Public
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Object[]} List of all plans or error message
+ */
 
 router.get("/plans/get", async (req: Request, res: Response) => {
   try {
@@ -34,9 +49,17 @@ router.get("/plans/get", async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}); // Get all plans
+});
 
-//router.get('/:id', getPlanById);        // Get a plan by ID
+/**
+ * @route GET /plan/:expert_id
+ * @description Get plans by expert ID
+ * @access Public
+ * @param {Request} req - Express request object containing expert_id in req.params
+ * @param {Response} res - Express response object
+ * @returns {Object[]} List of plans or error message
+ */
+
 router.get("/plan/:expert_id", async (req: Request, res: Response) => {
   try {
     const plans = await Plan.find({ expertId: req.params.expert_id });
@@ -47,7 +70,16 @@ router.get("/plan/:expert_id", async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}); // Get a plan by ID
+});
+
+/**
+ * @route PUT /:id
+ * @description Update a plan by ID
+ * @access Public
+ * @param {Request} req - Express request object containing plan ID in req.params and updated data in req.body
+ * @param {Response} res - Express response object
+ * @returns {Object} Updated plan or error message
+ */
 
 router.put("/:id", async (req: Request, res: Response) => {
   try {
@@ -68,7 +100,16 @@ router.put("/:id", async (req: Request, res: Response) => {
       res.status(400).json({ error: error.message });
     }
   }
-}); // Update a plan by ID
+});
+
+/**
+ * @route DELETE /:id
+ * @description Delete a plan by ID
+ * @access Public
+ * @param {Request} req - Express request object containing plan ID in req.params
+ * @param {Response} res - Express response object
+ * @returns {void} No content or error message
+ */
 
 router.delete("/:id", async (req: Request, res: Response) => {
   try {
@@ -80,6 +121,6 @@ router.delete("/:id", async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}); // Delete a plan by ID
+});
 
 export default router;
