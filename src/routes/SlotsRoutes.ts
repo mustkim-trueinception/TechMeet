@@ -6,8 +6,21 @@ import express from "express";
 
 const router = express.Router();
 
-// Define the routes for slots
-// Create a new slot
+/**
+ * @module SlotRouter
+ * @description Express router for handling slot-related operations.
+ */
+
+/**
+ * @route POST /slot/create
+ * @group Slots - Operations about slots
+ * @param {Slot} slot.body - Slot object to create
+ * @returns {Slot} 201 - Created slot object
+ * @returns {Error} 400 - Validation error
+ * @returns {Error} 500 - Internal server error
+ * @description Create a new slot.
+ */
+
 router.post("/slot/create", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod
@@ -26,7 +39,14 @@ router.post("/slot/create", async (req: Request, res: Response) => {
   }
 });
 
-// Get all slots
+/**
+ * @route GET /slots
+ * @group Slots - Operations about slots
+ * @returns {Array.<Slot>} 200 - List of all slots
+ * @returns {Error} 500 - Internal server error
+ * @description Retrieve all slots.
+ */
+
 router.get("/slots", async (req: Request, res: Response) => {
   try {
     const slots = await Slot.find();
@@ -36,7 +56,16 @@ router.get("/slots", async (req: Request, res: Response) => {
   }
 });
 
-// Get a slot by ID
+/**
+ * @route GET /slot/{expert_Id}
+ * @group Slots - Operations about slots
+ * @param {string} expert_Id.path.required - The expert ID to find the slot
+ * @returns {Slot} 200 - Found slot object
+ * @returns {Error} 404 - Slot not found
+ * @returns {Error} 500 - Internal server error
+ * @description Get a slot by expert ID.
+ */
+
 router.get("/slot/:expert_Id", async (req: Request, res: Response) => {
   try {
     console.log(req.params.expert_Id);
@@ -50,7 +79,18 @@ router.get("/slot/:expert_Id", async (req: Request, res: Response) => {
   }
 });
 
-// Update a slot by ID
+/**
+ * @route PUT /slot/{id}
+ * @group Slots - Operations about slots
+ * @param {string} id.path.required - The ID of the slot to update
+ * @param {Slot} slot.body - Slot object with updated values
+ * @returns {Slot} 200 - Updated slot object
+ * @returns {Error} 400 - Validation error
+ * @returns {Error} 404 - Slot not found
+ * @returns {Error} 500 - Internal server error
+ * @description Update a slot by ID.
+ */
+
 router.put("/slot:id", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod
@@ -73,7 +113,16 @@ router.put("/slot:id", async (req: Request, res: Response) => {
   }
 });
 
-// Delete a slot by ID
+/**
+ * @route DELETE /slot/{id}
+ * @group Slots - Operations about slots
+ * @param {string} id.path.required - The ID of the slot to delete
+ * @returns {204} 204 - No content
+ * @returns {Error} 404 - Slot not found
+ * @returns {Error} 500 - Internal server error
+ * @description Delete a slot by ID.
+ */
+
 router.delete("/slot:id", async (req: Request, res: Response) => {
   try {
     const slot = await Slot.findByIdAndDelete(req.params.id);

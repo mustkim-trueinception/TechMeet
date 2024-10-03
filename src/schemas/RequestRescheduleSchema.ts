@@ -1,11 +1,24 @@
 import { z } from "zod";
 // import { RequestedBy } from '../models/requestReschedule';
 
-// Define the Zod schema for rescheduling request
+/**
+ * @constant ReschedulingRequestSchemaZod
+ * @description Zod schema for validating the rescheduling request data
+ * @property {string} CurrentBookingId - The ID of the current booking (must be a valid 24-character ObjectId)
+ * @property {string} RequestedDateId - The ID of the requested new date (must be a valid 24-character ObjectId)
+ * @property {string} RequestedSlotId - The ID of the requested new slot (must be a valid 24-character ObjectId)
+ * @example
+ * {
+ *   CurrentBookingId: "5f50c31b52bdbb0012d95a5f",
+ *   RequestedDateId: "5f50c31b52bdbb0012d95a60",
+ *   RequestedSlotId: "5f50c31b52bdbb0012d95a61"
+ * }
+ */
+
 export const ReschedulingRequestSchemaZod = z.object({
-  CurrentBookingId: z.string().length(24, "Invalid booking ID format"), // Must be a valid ObjectId
+  CurrentBookingId: z.string().length(24, "Invalid booking ID format"),
   // RequestedBy: z.enum([RequestedBy.USER, RequestedBy.EXPERT]),
-  RequestedDateId: z.string().length(24, "Invalid date ID format"), // Must be a valid ObjectId
-  RequestedSlotId: z.string().length(24, "Invalid slots ID format"), // Must be a valid ObjectId
-  // expertId: z.string().length(24, "Invalid expert ID format"), // Must be a valid ObjectId
+  RequestedDateId: z.string().length(24, "Invalid date ID format"),
+  RequestedSlotId: z.string().length(24, "Invalid slots ID format"),
+  // expertId: z.string().length(24, "Invalid expert ID format")
 });

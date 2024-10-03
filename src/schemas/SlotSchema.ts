@@ -1,6 +1,24 @@
 import { z } from "zod";
 
-// Zod schema for slot validation
+/**
+ * @constant SlotSchemaZod
+ * @type {z.ZodObject}
+ * @description Zod schema for validating slot data.
+ * This schema ensures that all required fields are present and correctly formatted
+ * when creating or updating a slot.
+ * 
+ * @property {ZodString} availability - A string that indicates the availability status of the slot.
+ * Must be at least 3 characters long (e.g., "Available", "Not available").
+ * @property {ZodString} timing - A string that represents the time of the slot in "HH:MM" format.
+ * Must match the regular expression for valid time format.
+ * @property {ZodString} period - A string indicating the period of the day for the slot.
+ * Must be at least 3 characters long (e.g., "Morning", "Afternoon", "Night").
+ * @property {ZodString} planId - A string representing the ID of the associated Plan.
+ * Must be a 24-character long string.
+ * @property {ZodString} expertId - A string representing the ID of the associated Expert.
+ * Must be a 24-character long string.
+ */
+
 export const SlotSchemaZod = z.object({
   availability: z
     .string()

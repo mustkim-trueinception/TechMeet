@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { IExpert } from "./ExpertModel";
 
 // Request Reschedule by user /guest /client
 
@@ -9,7 +8,14 @@ import { IExpert } from "./ExpertModel";
 //   EXPERT = 'Expert'
 // }
 
-// Define the Mongoose document interface for rescheduling request
+/**
+ * @interface IReschedulingRequest
+ * @description Interface for ReschedulingRequest documents
+ * @property {mongoose.Schema.Types.ObjectId} CurrentBookingId - The current booking's ObjectId
+ * @property {mongoose.Schema.Types.ObjectId} RequestedDateId - The requested new date's ObjectId
+ * @property {mongoose.Schema.Types.ObjectId} RequestedSlotId - The requested new slot's ObjectId
+ */
+
 export interface IReschedulingRequest extends Document {
   CurrentBookingId: mongoose.Schema.Types.ObjectId;
   RequestedDateId: mongoose.Schema.Types.ObjectId;
@@ -17,7 +23,15 @@ export interface IReschedulingRequest extends Document {
   // expertId: mongoose.Schema.Types.ObjectId;
 }
 
-// Define the rescheduling request schema
+/**
+ * @constant reschedulingRequestSchema
+ * @description Mongoose schema for the ReschedulingRequest collection
+ * @property {mongoose.Schema.Types.ObjectId} CurrentBookingId - The reference to the current booking
+ * @property {mongoose.Schema.Types.ObjectId} RequestedDateId - The reference to the requested date
+ * @property {mongoose.Schema.Types.ObjectId} RequestedSlotId - The reference to the requested slot
+ * @property {Object} timestamps - Auto-generated timestamps for the document
+ */
+
 const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema(
   {
     CurrentBookingId: {
@@ -43,7 +57,11 @@ const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema(
   { timestamps: true }
 );
 
-// Create the Mongoose model for rescheduling request
+/**
+ * @constant ReschedulingRequest
+ * @description Mongoose model for the ReschedulingRequest collection
+ * @type {mongoose.Model<IReschedulingRequest>}
+ */
 const ReschedulingRequest = mongoose.model<IReschedulingRequest>(
   "ReschedulingRequest",
   reschedulingRequestSchema

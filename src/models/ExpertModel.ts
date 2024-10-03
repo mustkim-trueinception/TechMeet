@@ -1,7 +1,22 @@
-// models/expert.model.ts
-
 import mongoose, { Document, Schema } from "mongoose";
 
+/**
+ * Interface representing an expert in the system.
+ * @interface IExpert
+ * @extends {Document}
+ *
+ * @property {string} username - The unique username of the expert.
+ * @property {string} email - The email address of the expert.
+ * @property {string} fullname - The full name of the expert.
+ * @property {string[]} expertise - The areas of expertise of the expert.
+ * @property {string} designation - The designation or role of the expert (e.g., CTO, CMO, SA).
+ * @property {string} description - A brief description of the expert's profile.
+ * @property {string} avatar - URL to the expert's avatar image.
+ * @property {string} coverPhoto - URL to the expert's cover photo.
+ * @property {boolean} isAdmin - Indicates if the expert is an admin (default: false).
+ * @property {boolean} isActive - Indicates if the expert is currently active (default: true).
+ * @property {string[]} availableCities - The cities where the expert is available.
+ */
 export interface IExpert extends Document {
   username: string;
   email: string;
@@ -15,6 +30,23 @@ export interface IExpert extends Document {
   isActive: boolean;
 }
 
+/**
+ * Mongoose schema for the Expert model.
+ * Defines the structure of expert documents stored in MongoDB.
+ * @const ExpertSchema
+ *
+ * @property {string} username - The unique username of the expert (required, unique).
+ * @property {string} email - The email address of the expert (required, unique).
+ * @property {string} fullname - The full name of the expert (required).
+ * @property {string[]} expertise - An array of areas of expertise (required).
+ * @property {string} designation - The designation or role of the expert (required).
+ * @property {string} description - A brief description of the expert's profile (required).
+ * @property {string} avatar - URL to the avatar image (optional).
+ * @property {string} coverPhoto - URL to the cover photo (optional).
+ * @property {string[]} availableCities - An array of cities where the expert is available (required).
+ * @property {boolean} isAdmin - Boolean indicating if the expert is an admin (default: false).
+ * @property {boolean} isActive - Boolean indicating if the expert is currently active (default: true).
+ */
 const ExpertSchema: Schema = new Schema(
   {
     username: { type: String, required: true, unique: true },

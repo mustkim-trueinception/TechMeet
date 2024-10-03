@@ -1,7 +1,15 @@
 import { z } from "zod";
 
-// Zod validation schema for rescheduling options
-export const ReschedulingOptionsSchemaZod = z.object({
+/**
+ * @constant ReschedulingOptionsSchemaZod
+ * @description Zod schema for validating rescheduling options. It checks for the following:
+ * - CurrentBookingId: a required non-empty string representing the current booking ID.
+ * - availableSlots: an array of objects, each containing:
+ *   - dateId: a required non-empty string representing the date.
+ *   - slotId: a required non-empty string representing the slot ID.
+ *   - The array must contain at least 3 options.
+ * - expiryDate: an optional date field, which will be generated in the backend.
+ */export const ReschedulingOptionsSchemaZod = z.object({
   CurrentBookingId: z.string().nonempty("Current booking ID is required"),
   availableSlots: z
     .array(
