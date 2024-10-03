@@ -10,9 +10,19 @@ import { Plan } from "../models/PlanModel";
 
 const router = express.Router();
 
-// Define the routes for dates
 
-// Create a new date entry
+/**
+ * @route POST /date/create
+ * @group Date - Operations about date
+ * @param {object} req.body - The date entry to create
+ * @param {string} req.body.date - The date in "DD/MM/YYYY" format
+ * @param {("holiday"|"available"|"not available"|"booked")} req.body.availability - The availability status
+ * @param {string} req.body.expertId - The ID of the expert associated with the date
+ * @param {Array<string>} [req.body.slotsId] - Optional array of slot IDs
+ * @returns {object} 201 - The created date entry
+ * @returns {Error} 400 - Invalid input data
+ * @returns {Error} 500 - Internal server error
+ */
 router.post("/date/create", async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod
@@ -31,7 +41,13 @@ router.post("/date/create", async (req: Request, res: Response) => {
   }
 });
 
-// Get all date entries
+
+/**
+ * @route GET /dates
+ * @group Date - Operations about date
+ * @returns {Array<object>} 200 - List of all date entries
+ * @returns {Error} 500 - Internal server error
+ */
 router.get("/dates", async (req: Request, res: Response) => {
   try {
     const dates = await DateModel.find().populate("expertId").populate("slots");
@@ -41,7 +57,15 @@ router.get("/dates", async (req: Request, res: Response) => {
   }
 });
 
-// Get a date entry by ID
+
+/**
+ * @route GET /date/{expertid}
+ * @group Date - Operations about date
+ * @param {string} expertid.path.required - The ID of the expert
+ * @returns {Array<object>} 200 - The date entries associated with the expert
+ * @returns {Error} 404 - Date entry not found
+ * @returns {Error} 500 - Internal server error
+ */
 router.get("/date/:expertid", async (req: Request, res: Response) => {
   try {
     const dateEntry = await DateModel.find({ expertId: req.params.expertid });
@@ -54,6 +78,16 @@ router.get("/date/:expertid", async (req: Request, res: Response) => {
   }
 });
 
+
+/**
+ * @route POST /calendar
+ * @group Calendar - Operations about calendars
+ * @param {object} req.body - The plan ID to fetch dates and slots
+ * @param {string} req.body.plan_id - The ID of the plan
+ * @returns {object} 200 - The structured data including plan, expert, and dates
+ * @returns {Error} 404 - Plan or expert not found
+ * @returns {Error} 500 - Internal server error
+ */
 router.post("/calendar", async (req: Request, res: Response) => {
   const { plan_id } = req.body;
 
@@ -124,7 +158,21 @@ router.post("/calendar", async (req: Request, res: Response) => {
   }
 });
 
-// Update a date entry by ID
+
+/**
+ * @route PUT /{id}
+ * @group Date - Operations about date
+ * @param {string} id.path.required - The ID of the date entry to update
+ * @param {object} req.body - The updated date entry data
+ * @param {string} [req.body.date] - The updated date in "DD/MM/YYYY" format
+ * @param {("holiday"|"available"|"not available"|"booked")} [req.body.availability] - The updated availability status
+ * @param {string} [req.body.expertId] - The updated ID of the expert associated with the date
+ * @param {Array<string>} [req.body.slotsId] - Optional updated array of slot IDs
+ * @returns {object} 200 - The updated date entry
+ * @returns {Error} 404 - Date entry not found
+ * @returns {Error} 400 - Invalid input data
+ * @returns {Error} 500 - Internal server error
+ */
 router.put("/:id", async (req: Request, res: Response) => {
   try {
     // Validate request data with Zod (allow partial updates)
@@ -148,8 +196,15 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Delete a date entry by ID
 
+/**
+ * @route DELETE /{date_Id}
+ * @group Date - Operations about date
+ * @param {string} date_Id.path.required - The ID of the date entry to delete
+ * @returns {204} 204 - No Content
+ * @returns {Error} 404 - Date entry not found
+ * @returns {Error} 500 - Internal server error
+ */
 router.delete("/:date_Id", async (req: Request, res: Response) => {
   try {
     const dateEntry = await DateModel.findByIdAndDelete(req.params.date_Id);

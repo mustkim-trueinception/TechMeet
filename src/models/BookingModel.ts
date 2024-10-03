@@ -1,14 +1,19 @@
-import { BookingSchemaZod } from "../schemas/BookingSchema";
 import mongoose, { Schema, Document } from "mongoose";
 
-// Define enums for guest occupation
+/**
+ * Enum for different guest occupations.
+ * @enum {string}
+ */
 enum GuestOccupation {
   STUDENT = "Student",
   BUSINESSMAN = "Businessperson",
   WORKING_PROFESSIONAL = "Working Professional",
 }
 
-// Define enum for status
+/**
+ * Enum for booking status.
+ * @enum {string}
+ */
 export enum Status {
   PENDING = "Pending",
   COMPLETED = "Completed",
@@ -16,7 +21,27 @@ export enum Status {
   RESCHEDULED = "Rescheduled",
 }
 
-// Define the Mongoose document interface for booking
+/**
+ * Interface representing a Booking document in MongoDB.
+ * @interface IBooking
+ * @extends {Document}
+ * @property {string} guestName - Name of the guest.
+ * @property {mongoose.Schema.Types.ObjectId} dateId - Reference to the Date model.
+ * @property {GuestOccupation} guestOccupation - Occupation of the guest.
+ * @property {number} guestAge - Age of the guest.
+ * @property {string} guestCity - City of the guest.
+ * @property {string} guestEmail - Email of the guest.
+ * @property {string} guestPhone - Phone number of the guest.
+ * @property {string} guestWhatsapp - WhatsApp number of the guest.
+ * @property {string} guestWebsite - Website of the guest (optional).
+ * @property {string} guestProblem - Description of the guest's problem.
+ * @property {string} [guestVoiceNote] - Voice note from the guest (optional).
+ * @property {string[]} tags - Tags related to the booking.
+ * @property {boolean} guestKYC - KYC status of the guest.
+ * @property {mongoose.Schema.Types.ObjectId} expertId - Reference to the Expert model.
+ * @property {mongoose.Schema.Types.ObjectId} slotId - Reference to the Slot model.
+ * @property {Status} status - Current status of the booking.
+ */
 export interface IBooking extends Document {
   guestName: string;
   dateId: mongoose.Schema.Types.ObjectId;
@@ -31,16 +56,19 @@ export interface IBooking extends Document {
   guestVoiceNote?: string; // Optional field
   tags: string[];
   guestKYC: boolean;
-  expertId: mongoose.Schema.Types.ObjectId; // Reference to Expert model
-  slotId: mongoose.Schema.Types.ObjectId; // Reference to Slot model
+  expertId: mongoose.Schema.Types.ObjectId;
+  slotId: mongoose.Schema.Types.ObjectId;
   status: Status;
 }
 
-// Define the Mongoose schema for booking
+/**
+ * Mongoose schema for the Booking collection.
+ * @type {Schema<IBooking>}
+ */
 const bookingSchema: Schema = new Schema(
   {
     guestName: { type: String, required: true },
-    dateId: { type: Schema.Types.ObjectId, ref: "Date", required: true }, // Reference to Date model,
+    dateId: { type: Schema.Types.ObjectId, ref: "Date", required: true },
     guestOccupation: {
       type: String,
       enum: Object.values(GuestOccupation),
@@ -56,11 +84,15 @@ const bookingSchema: Schema = new Schema(
     guestVoiceNote: { type: String }, // Optional field
     tags: [{ type: String, required: true }],
     guestKYC: { type: Boolean, required: true },
-    expertId: { type: Schema.Types.ObjectId, ref: "Expert", required: true }, // Reference to Expert model
-    slotId: { type: Schema.Types.ObjectId, ref: "Slot", required: true }, // Reference to Slot model
+    expertId: { type: Schema.Types.ObjectId, ref: "Expert", required: true },
+    slotId: { type: Schema.Types.ObjectId, ref: "Slot", required: true },
     status: { type: String, enum: Object.values(Status), required: true },
   },
   { timestamps: true }
 );
 
+/**
+ * The Booking model based on the booking schema.
+ * @typedef {mongoose.Model<IBooking>}
+ */
 export const BookingSchema = mongoose.model<IBooking>("Booking", bookingSchema);
