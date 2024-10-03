@@ -11,10 +11,15 @@ import planRoutes from "./routes/PlanRoutes";
 import requestRescheduleRoute from "./routes/RequestRescheduleRoutes";
 import reschedulingOptionsRoute from "./routes/ReschedulingOptionsRoutes";
 import SlotsRoutes from "./routes/SlotsRoutes";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./docs/swagger"; // load the YAML file
 
 const app = express();
 app.use(express.json()); // to accept json data
 dotenv.config(); // Load environment variables
+
+// Swagger route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // import routes
 
