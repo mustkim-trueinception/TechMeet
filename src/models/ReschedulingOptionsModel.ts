@@ -1,14 +1,25 @@
 import { times } from "lodash";
 import mongoose, { Schema, Document } from "mongoose";
 
-// Define the Mongoose document interface for rescheduling options
+/**
+ * @interface ReschedulingOptions
+ * @extends Document
+ * @property {mongoose.Types.ObjectId} CurrentBookingId - The ID of the current booking (must be a valid ObjectId).
+ * @property {Array<{ dateId: string; slotId: string }>} availableSlots - An array of available slots for rescheduling, each containing a dateId and a slotId.
+ * @property {Date} expiryDate - The date and time until the rescheduling options are valid.
+ */
+
 export interface ReschedulingOptions extends Document {
   CurrentBookingId: mongoose.Types.ObjectId;
   availableSlots: Array<{ dateId: string; slotId: string }>;
   expiryDate: Date;
 }
 
-// Define the Mongoose schema for rescheduling options
+/**
+ * @class ReschedulingOptionsSchema
+ * @description Mongoose schema for managing rescheduling options.
+ */
+
 const reschedulingOptionsSchema: Schema = new Schema<ReschedulingOptions>(
   {
     CurrentBookingId: {
@@ -35,7 +46,10 @@ const reschedulingOptionsSchema: Schema = new Schema<ReschedulingOptions>(
   { timestamps: true }
 );
 
-// Export the Mongoose model
+/**
+ * @constant ReschedulingOptions
+ * @description Mongoose model for rescheduling options, allowing interaction with the rescheduling options collection in the database.
+ */
 export const ReschedulingOptions = mongoose.model<ReschedulingOptions>(
   "ReschedulingOptions",
   reschedulingOptionsSchema

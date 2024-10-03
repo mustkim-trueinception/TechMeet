@@ -1,4 +1,16 @@
-// Experts route with jwt authentication
+/**
+ * @module ExpertRoutes
+ * @requires express
+ * @requires Expert
+ * @requires ExpertSchemaZod
+ * @requires jwt
+ * @requires authenticateJWT
+ * @requires z
+ * @requires ReschedulingRequest
+ * @requires mongoose
+ * @requires BookingSchema
+ */
+
 import express from "express";
 import { Expert, IExpert } from "../models/ExpertModel";
 import { ExpertSchemaZod } from "../schemas/ExpertSchema";
@@ -16,8 +28,14 @@ import { BookingSchema, Status } from "../models/BookingModel";
 
 const router = express.Router();
 
-// Define the routes
-// Create a new expert
+/**
+ * @route POST /expert/create
+ * @description Create a new expert
+ * @access Public
+ * @param {Request} req - Express request object, with expert data in the body
+ * @param {Response} res - Express response object, returns created expert or error
+ */
+
 router.post("/expert/create", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
@@ -36,7 +54,14 @@ router.post("/expert/create", async (req: Request, res: Response) => {
   }
 });
 
-// Get all experts
+/**
+ * @route GET /experts
+ * @description Get all experts
+ * @access Public
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object, returns all experts or error
+ */
+
 router.get("/experts", async (req: Request, res: Response) => {
   try {
     const experts = await Expert.find();
@@ -46,7 +71,14 @@ router.get("/experts", async (req: Request, res: Response) => {
   }
 });
 
-// Get an expert by ID
+/**
+ * @route GET /expert/:id
+ * @description Get an expert by ID
+ * @access Public
+ * @param {Request} req - Express request object, expert ID in the params
+ * @param {Response} res - Express response object, returns expert or error
+ */
+
 router.get("/expert/:id", async (req: Request, res: Response) => {
   try {
     const expert = await Expert.findById(req.params.id);
@@ -59,7 +91,14 @@ router.get("/expert/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Update an expert by ID
+/**
+ * @route PUT /expert/:id
+ * @description Update an expert by ID
+ * @access Public
+ * @param {Request} req - Express request object, expert ID in the params, updated data in the body
+ * @param {Response} res - Express response object, returns updated expert or error
+ */
+
 router.put("/expert/:id", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod schema
@@ -82,7 +121,14 @@ router.put("/expert/:id", async (req: Request, res: Response) => {
   }
 });
 
-// Delete an expert by ID
+/**
+ * @route DELETE /expert/:id
+ * @description Delete an expert by ID
+ * @access Public
+ * @param {Request} req - Express request object, expert ID in the params
+ * @param {Response} res - Express response object, returns 204 on success or error
+ */
+
 router.delete("/expert/:id", async (req: Request, res: Response) => {
   try {
     const expert = await Expert.findByIdAndDelete(req.params.id);
@@ -95,7 +141,14 @@ router.delete("/expert/:id", async (req: Request, res: Response) => {
   }
 });
 
-// GET route to list reschedule requests from guests (35:  working code)
+/**
+ * @route GET /reschedule-request
+ * @description List all reschedule requests from guests
+ * @access Public
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object, returns reschedule requests
+ */
+
 router.get("/reschedule-request", async (req: Request, res: Response) => {
   try {
     // Fetch all rescheduling requests without populating the entire document
@@ -118,7 +171,14 @@ router.get("/reschedule-request", async (req: Request, res: Response) => {
   }
 });
 
-// GET route to list reschedule requests by expert ID ( 34: only for admin orking code)
+/**
+ * @route GET /reschedule-requests/:ExpertId
+ * @description List reschedule requests by expert ID
+ * @access Public
+ * @param {Request} req - Express request object, expert ID in the params
+ * @param {Response} res - Express response object, returns reschedule requests for the expert
+ */
+
 router.get(
   "/reschedule-requests/:ExpertId",
   async (req: Request, res: Response) => {
@@ -167,13 +227,21 @@ router.get(
   }
 );
 
-// GET route to list all reschedule requests (for admin)
+/**
+ * @route GET /reschedule-requests
+ * @description List all reschedule requests (for admin)
+ * @access Admin
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object, returns all reschedule requests
+ */
+
 router.get("/reschedule-requests", async (req: Request, res: Response) => {
   try {
     // Fetch all rescheduling requests and populate the expert's username
     const requests = await ReschedulingRequest.find()
       .populate({
         path: "CurrentBookingId",
+        select: "_Id",
         populate: {
           path: "expertId",
           model: "Expert",
@@ -181,10 +249,12 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
         },
       })
       .populate({
-        path: "RequestedDateId", // Populate date details if needed
+        path: "RequestedDateId",
+        select: "date", // Populate date details if needed
       })
       .populate({
-        path: "RequestedSlotId", // Populate slot details if needed
+        path: "RequestedSlotId",
+        select: "_Id", // Populate slot details if needed
       });
     console.log(requests);
 
@@ -193,7 +263,6 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
       currentBookingId: request.CurrentBookingId, // Include the relevant fields
       requestedDateId: request.RequestedDateId,
       requestedSlotId: request.RequestedSlotId,
-      expertName: request.CurrentBookingId?.expertId?.username || null, // Use optional chaining and default to null
     }));
 
     res.status(200).json({
@@ -208,8 +277,14 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
   }
 });
 
-// Handle-Reschedule Requests
-// POST route to handle expert reschedule requests
+/**
+ * @route POST /handle-Reschedule
+ * @description Handle expert reschedule requests
+ * @access Public
+ * @param {Request} req - Express request object, including reschedule data
+ * @param {Response} res - Express response object, returns success or error
+ */
+
 router.post("/handle-Reschedule", async (req: Request, res: Response) => {
   const {
     CurrentBookingId,
