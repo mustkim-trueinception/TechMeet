@@ -72,6 +72,23 @@ router.get("/experts", async (req: Request, res: Response) => {
 });
 
 /**
+ * @route GET /guest/experts
+ * @description Get all experts
+ * @access Public
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object, returns all experts or error
+ */
+
+router.get("/guest/experts", async (req: Request, res: Response) => {
+  try {
+    const experts = await Expert.find();
+    res.status(200).json(experts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * @route GET /expert/:id
  * @description Get an expert by ID
  * @access Public

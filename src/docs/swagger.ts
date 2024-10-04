@@ -25,10 +25,10 @@ interface SwaggerDocument {
   paths: Record<string, unknown>;
 }
 
-// // Load multiple YAML files
-// const GuestSwaggerDocument: SwaggerDocument = YAML.load(
-//   path.join(process.cwd(), "./src/docs/guest.yaml")
-// );
+// Load multiple YAML files
+const GuestSwaggerDocument: SwaggerDocument = YAML.load(
+  path.join(process.cwd(), "./src/docs/guest.yaml")
+);
 const ExpertSwaggerDocument: SwaggerDocument = YAML.load(
   path.join(process.cwd(), "./src/docs/expert.yaml")
 );
@@ -58,7 +58,7 @@ const swaggerDocument: SwaggerDocument = {
     },
   },
   paths: {
-    //...GuestSwaggerDocument.paths,
+    ...GuestSwaggerDocument.paths,
     ...ExpertSwaggerDocument.paths,
   },
 };
