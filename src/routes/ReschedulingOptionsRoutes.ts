@@ -44,7 +44,7 @@ router.post("/reschedule-options", async (req: Request, res: Response) => {
 
     // Create a new rescheduling options entry
     const newReschedulingOptions = new ReschedulingOptions({
-      currentBookingId: validatedData.CurrentBookingId,
+      CurrentBookingId: validatedData.CurrentBookingId,
       availableSlots: validatedData.availableSlots,
       expiryDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24-hour expiry
     });
@@ -53,7 +53,7 @@ router.post("/reschedule-options", async (req: Request, res: Response) => {
     // Send response with the new rescheduling options
     res.status(201).json({
       message: "Rescheduling options created successfully",
-      currentBookingId: newReschedulingOptions.CurrentBookingId,
+      CurrentBookingId: newReschedulingOptions.CurrentBookingId,
       availableSlots: newReschedulingOptions.availableSlots,
       expiryDate: newReschedulingOptions.expiryDate,
     });

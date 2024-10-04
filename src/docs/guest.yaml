@@ -1,0 +1,59 @@
+# components:
+#   securitySchemes:
+#     BearerAuth:
+#       type: http
+#       scheme: bearer
+#       bearerFormat: JWT
+
+#   schemas:
+#     Plan:
+#       type: object
+#       properties:
+#         name:
+#           type: string
+#           example: "Consultation Plan"
+#         channel:
+#           type: string
+#           example: "Video Call"
+#         duration:
+#           type: number
+#           example: 60
+#         price:
+#           type: string
+#           example: "100 USD"
+#         bookingType:
+#           type: string
+#           example: "appointment"
+#         expertId:
+#           type: string
+#           example: "609dcd72699a1f02b8c9f0d7"
+#         isDedicated:
+#           type: boolean
+#           example: false
+
+#   /api/v1/plan/{expert_id}:
+#     get:
+#       summary: Get all plans for a specific expert
+#       description: Fetches all the plans associated with a given expert by their ID.
+#       tags:
+#         - Plans
+#       parameters:
+#         - in: path
+#           name: expert_id
+#           schema:
+#             type: string
+#           required: true
+#           description: The ID of the expert whose plans you want to retrieve.
+#       responses:
+#         '200':
+#           description: Successfully retrieved plans
+#           content:
+#             application/json:
+#               schema:
+#                 type: array
+#                 items:
+#                   $ref: '#/components/schemas/Plan'
+#         '404':
+#           description: No plans found for this expert
+#         '500':
+#           description: Internal server error

@@ -1,0 +1,219 @@
+paths:
+  /api/v1/Booking/{UID}:
+    get:
+      summary: Get a booking by UID
+      description: Retrieves a booking entry from the database by its unique UID.
+      tags:
+        - Expert
+      parameters:
+        - name: UID
+          in: path
+          required: true
+          description: The unique UID of the booking entry.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Booking object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uid:
+                    type: string
+                    description: The unique UID of the booking.
+                  guestName:
+                    type: string
+                    description: The name of the guest who made the booking.
+                  dateId:
+                    type: string
+                    description: The ID of the associated date.
+                  guestOccupation:
+                    type: string
+                    description: The occupation of the guest.
+                  guestAge:
+                    type: number
+                    description: The age of the guest.
+                  guestCity:
+                    type: string
+                    description: The city of the guest.
+                  guestEmail:
+                    type: string
+                    description: The email of the guest.
+                  guestPhone:
+                    type: string
+                    description: The phone number of the guest.
+                  guestWhatsapp:
+                    type: string
+                    description: The WhatsApp number of the guest.
+                  guestWebsite:
+                    type: string
+                    description: The website of the guest (optional).
+                  guestProblem:
+                    type: string
+                    description: The problem description provided by the guest.
+                  guestVoiceNote:
+                    type: string
+                    description: A link to the guest's voice note (optional).
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                    description: Tags related to the booking.
+                  guestKYC:
+                    type: boolean
+                    description: Whether KYC is provided by the guest.
+                  expertId:
+                    type: string
+                    description: The ID of the expert associated with the booking.
+                  slotId:
+                    type: string
+                    description: The ID of the slot for the booking.
+                  status:
+                    type: string
+                    description: The status of the booking (e.g., pending, confirmed, canceled).
+                required:
+                  - uid
+                  - expertId
+                  - guestName
+                  - dateId
+                  - guestOccupation
+                  - guestAge
+                  - guestCity
+                  - guestEmail
+                  - guestPhone
+                  - guestWhatsapp
+                  - guestProblem
+                  - tags
+                  - guestKYC
+                  - slotId
+                  - status
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Date entry not found"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Error message here"
+
+  /api/v1/reschedule-options:
+    post:
+      summary: Create rescheduling options for guest
+      description: Creates a new rescheduling options entry in the database.
+      tags:
+        - Expert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CurrentBookingId:
+                  type: string
+                  description: The current booking ID.
+                  example: "66fa7135fd0d1791679acc41"
+                availableSlots:
+                  type: array
+                  description: The available rescheduling slots.
+                  items:
+                    type: object
+                    properties:
+                      dateId:
+                        type: string
+                        description: The ID of the date for the slot.
+                        example: "603d5b22d2f6e18f88f9a1c5"
+                      slotId:
+                        type: string
+                        description: The ID of the available slot.
+                        example: "603d5b22d2f6e18f88f9a1c6"
+                expiryDate:
+                  type: string
+                  format: date-time # Keep this as 'date-time' to allow correct input
+                  description: The expiry date for the rescheduling options.
+                  example: "2024-10-05T14:30:00Z"
+              required:
+                - CurrentBookingId
+                - availableSlots
+                - expiryDate
+      responses:
+        "201":
+          description: Rescheduling options successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Rescheduling options created successfully"
+                  CurrentBookingId:
+                    type: string
+                    description: The current booking ID.
+                    example: "66fa7135fd0d1791679acc41"
+                  availableSlots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        dateId:
+                          type: string
+                          description: The ID of the date for the slot.
+                          example: "603d5b22d2f6e18f88f9a1c5"
+                        slotId:
+                          type: string
+                          description: The ID of the available slot.
+                          example: "603d5b22d2f6e18f88f9a1c6"
+                  expiryDate:
+                    type: string
+                    format: date-time
+                    description: The expiry date of the rescheduling options.
+                    example: "2024-10-05T14:30:00Z"
+        "400":
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                          description: The field that failed validation.
+                          example: "availableSlots[0].slotId"
+                        message:
+                          type: string
+                          description: The validation error message.
+                          example: "Slot ID is required."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+                  error:
+                    type: string
+                    description: The error message.
+                    example: "Database connection failed"
