@@ -72,6 +72,23 @@ router.get("/experts", async (req: Request, res: Response) => {
 });
 
 /**
+ * @route GET /guest/experts
+ * @description Get all experts
+ * @access Public
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object, returns all experts or error
+ */
+
+router.get("/guest/experts", async (req: Request, res: Response) => {
+  try {
+    const experts = await Expert.find();
+    res.status(200).json(experts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * @route GET /expert/:id
  * @description Get an expert by ID
  * @access Public
@@ -156,9 +173,9 @@ router.get("/reschedule-request", async (req: Request, res: Response) => {
 
     // Send the response with only the required fields
     const formattedRequests = requests.map((request) => ({
-      currentBookingId: request.CurrentBookingId,
-      requestedDateId: request.RequestedDateId,
-      requestedSlotId: request.RequestedSlotId,
+      CurrentBookingId: request.CurrentBookingId,
+      RequestedDateId: request.RequestedDateId,
+      RequestedSlotId: request.RequestedSlotId,
     }));
 
     res.status(200).json({
@@ -207,10 +224,10 @@ router.get(
 
       // Format the response to include the necessary fields
       const formattedRequests = requests.map((request) => ({
-        currentBookingId: request.CurrentBookingId, // Include the booking ID or details
-        requestedDateId: request.RequestedDateId, // Include the requested date
-        requestedSlotId: request.RequestedSlotId, // Include the requested slot
-        expertName: expert.username, // Include the expert's username
+        CurrentBookingId: request.CurrentBookingId, // Include the booking ID or details
+        RequestedDateId: request.RequestedDateId, // Include the requested date
+        RequestedSlotId: request.RequestedSlotId, // Include the requested slot
+        ExpertName: expert.username, // Include the expert's username
       }));
 
       // Send the response
@@ -260,9 +277,9 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
 
     // Format the response to include only the required fields
     const formattedRequests = requests.map((request) => ({
-      currentBookingId: request.CurrentBookingId, // Include the relevant fields
-      requestedDateId: request.RequestedDateId,
-      requestedSlotId: request.RequestedSlotId,
+      CurrentBookingId: request.CurrentBookingId, // Include the relevant fields
+      RequestedDateId: request.RequestedDateId,
+      RequestedSlotId: request.RequestedSlotId,
     }));
 
     res.status(200).json({
@@ -317,12 +334,20 @@ router.post("/handle-Reschedule", async (req: Request, res: Response) => {
 
       await booking.save();
 
-      // Optionally, delete the rescheduling request if it was accepted
-      await ReschedulingRequest.deleteOne({
-        CurrentBookingId: CurrentBookingId,
+      // // Optionally, delete the rescheduling request if it was accepted
+      // await ReschedulingRequest.deleteOne({
+      //   CurrentBookingId: CurrentBookingId,
+      // });
+
+      await ReschedulingRequest.create({
+        CurrentBookingId,
+        RequestedDateId,
+        RequestedSlotId,
+        newDate,
       });
 
-      return res.status(200).json({
+      // Send the response
+      res.status(200).json({
         message: "Reschedule request accepted successfully",
         booking,
       });
@@ -332,18 +357,44 @@ router.post("/handle-Reschedule", async (req: Request, res: Response) => {
         CurrentBookingId: CurrentBookingId,
       });
 
-      return res.status(200).json({
+      booking.status = Status.REJECTED;
+      await booking.save();
+
+      // Send the response
+      res.status(200).json({
         message: "Reschedule request rejected successfully",
       });
-    } else {
-      return res.status(400).json({ message: "Invalid action" });
     }
   } catch (error) {
     console.error("Error handling reschedule request:", error);
-    return res
+    res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
   }
 });
+
+//       return res.status(200).json({
+//         message: "Reschedule request accepted successfully",
+//         booking,
+//       });
+//     } else if (action === "rejected") {
+//       // Optionally, delete the rescheduling request if it was rejected
+//       await ReschedulingRequest.deleteOne({
+//         CurrentBookingId: CurrentBookingId,
+//       });
+
+//       return res.status(200).json({
+//         message: "Reschedule request rejected successfully",
+//       });
+//     } else {
+//       return res.status(400).json({ message: "Invalid action" });
+//     }
+//   } catch (error) {
+//     console.error("Error handling reschedule request:", error);
+//     return res
+//       .status(500)
+//       .json({ message: "Internal server error", error: error.message });
+//   }
+// });
 
 export default router;

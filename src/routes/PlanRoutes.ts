@@ -111,13 +111,15 @@ router.put("/:id", async (req: Request, res: Response) => {
  * @returns {void} No content or error message
  */
 
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/plan/:id", async (req: Request, res: Response) => {  // /api/v1/plan => added
   try {
     const plan = await Plan.findByIdAndDelete(req.params.id);
     if (!plan) {
       return res.status(404).json({ error: "Plan not found" });
     }
-    res.status(204).send();
+    res.status(204).json({
+      message: "Plan deleted successfully",   // message added for the response
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

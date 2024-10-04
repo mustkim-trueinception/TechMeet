@@ -1,59 +1,450 @@
-# components:
-#   securitySchemes:
-#     BearerAuth:
-#       type: http
-#       scheme: bearer
-#       bearerFormat: JWT
+paths:
+  /api/v1/guest/experts:
+    get:
+      tags:
+        - Guest
+      summary: Get all experts
+      description: Retrieves a list of all available experts for Guest.
+      operationId: getAllExperts
+      responses:
+        '200':
+          description: A list of experts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 615a4c4b8a1a2a001c0f21de
+                    username:
+                      type: string
+                      example: johndoe123
+                    email:
+                      type: string
+                      example: johndoe@example.com
+                    fullname:
+                      type: string
+                      example: John Doe
+                    expertise:
+                      type: array
+                      items:
+                        type: string
+                      example: ["Software Development", "AI"]
+                    designation:
+                      type: string
+                      example: Senior Developer
+                    description:
+                      type: string
+                      example: Expert in software engineering and AI solutions.
+                    avatar:
+                      type: string
+                      example: https://example.com/avatar.jpg
+                    coverPhoto:
+                      type: string
+                      example: https://example.com/cover.jpg
+                    availableCities:
+                      type: array
+                      items:
+                        type: string
+                      example: ["New York", "San Francisco"]
+                    isAdmin:
+                      type: boolean
+                      example: false
+                    isActive:
+                      type: boolean
+                      example: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: 2023-10-03T12:34:56.789Z
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: 2023-10-03T12:34:56.789Z
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Something went wrong."
 
-#   schemas:
-#     Plan:
-#       type: object
-#       properties:
-#         name:
-#           type: string
-#           example: "Consultation Plan"
-#         channel:
-#           type: string
-#           example: "Video Call"
-#         duration:
-#           type: number
-#           example: 60
-#         price:
-#           type: string
-#           example: "100 USD"
-#         bookingType:
-#           type: string
-#           example: "appointment"
-#         expertId:
-#           type: string
-#           example: "609dcd72699a1f02b8c9f0d7"
-#         isDedicated:
-#           type: boolean
-#           example: false
 
-#   /api/v1/plan/{expert_id}:
-#     get:
-#       summary: Get all plans for a specific expert
-#       description: Fetches all the plans associated with a given expert by their ID.
-#       tags:
-#         - Plans
-#       parameters:
-#         - in: path
-#           name: expert_id
-#           schema:
-#             type: string
-#           required: true
-#           description: The ID of the expert whose plans you want to retrieve.
-#       responses:
-#         '200':
-#           description: Successfully retrieved plans
-#           content:
-#             application/json:
-#               schema:
-#                 type: array
-#                 items:
-#                   $ref: '#/components/schemas/Plan'
-#         '404':
-#           description: No plans found for this expert
-#         '500':
-#           description: Internal server error
+  /api/v1/plan/{expert_id}:
+    get:
+      tags:
+        - Guest
+      summary: Get plans by expert ID , There are plans for each expert
+      description: Retrieves a list of plans associated with a specific expert.
+      operationId: getPlansByExpertId
+      parameters:
+        - name: expert_id
+          in: path
+          required: true
+          description: The ID of the expert
+          schema:
+            type: string
+            example: 615a4c4b8a1a2a001c0f21de
+      responses:
+        '200':
+          description: A list of plans for the given expert ID
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: "615a4c4b8a1a2a001c0f21df"
+                    name:
+                      type: string
+                      example: "Onsite Seminar"
+                    channel:
+                      type: string
+                      example: "Onsite"
+                    duration:
+                      type: number
+                      example: 180
+                    price:
+                      type: string
+                      example: "35000"
+                    bookingType:
+                      type: string
+                      example: "appointment"
+                    expertId:
+                      type: string
+                      example: "66f65ba4644085f5dc6ae5a8"
+                    isDedicated:
+                      type: boolean
+                      example: false
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2024-09-28T07:56:21.414+00:00"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2024-09-28T07:56:21.414+00:00"
+                    __v:
+                      type: number
+                      example: 0
+
+        '404':
+          description: No plans found for this expert
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No plans found for this expert"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Something went wrong."
+
+  /api/v1/calendar:
+    post:
+      tags:
+        - Guest
+      summary: Fetch plan details, expert, dates, and slots 
+      description: Retrieves structured data including plan information, related expert, dates, and available slots for the given plan ID.
+      operationId: fetchCalendarDetails
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan_id:
+                  type: string
+                  description: The ID of the plan
+                  example: 66fa986da9f7ae8c8381277f
+      responses:
+        '200':
+          description: Successfully retrieved the calendar data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "615a4c4b8a1a2a001c0f21de"
+                      name:
+                        type: string
+                        example: "One-on-One Consultation"
+                      channel:
+                        type: string
+                        example: "Zoom"
+                      duration:
+                        type: number
+                        example: 60
+                      price:
+                        type: string
+                        example: "$100"
+                      bookingType:
+                        type: string
+                        example: "appointment"
+                      expertId:
+                        type: string
+                        example: "615a4c4b8a1a2a001c0f21df"
+                      isDedicated:
+                        type: boolean
+                        example: false
+                  expert:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "615a4c4b8a1a2a001c0f21df"
+                      fullname:
+                        type: string
+                        example: "John Doe"
+                      expertise:
+                        type: array
+                        items:
+                          type: string
+                        example: ["AI", "Software Development"]
+                  dates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: "66f7b92cdf67583ef456a4b1"
+                        date:
+                          type: string
+                          example: "23/11/2024"
+                        availability:
+                          type: string
+                          example: "available"
+                        expertId:
+                          type: string
+                          example: "66f65ba4644085f5dc6ae5a8"
+                        slots:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: "66f69217d057d1f45ee2d1c9"
+                              availability:
+                                type: string
+                                example: "available"
+                              timing:
+                                type: string
+                                example: "10:00 - 11:00"
+                              period:
+                                type: string
+                                example: "morning"
+                              expertId:
+                                type: string
+                                example: "66f65ba4644085f5dc6ae5a8"
+                              planId:
+                                type: string
+                                example: "615a4c4b8a1a2a001c0f21de"
+        '404':
+          description: Plan or expert not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Plan not found"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Detailed error message"
+
+
+
+
+
+  /api/v1/book-appointment:
+    post:
+      tags:
+        - Guest
+      summary: Book an appointment
+      description: Creates a new appointment booking with the provided guest and booking details.
+      operationId: bookAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guestName:
+                  type: string
+                  example: "John Doe"
+                dateId:
+                  type: string
+                  description: ID of the selected date
+                  example: "615a4c4b8a1a2a001c0f21de"
+                guestOccupation:
+                  type: string
+                  example: "Student"
+                guestAge:
+                  type: number
+                  example: 30
+                guestCity:
+                  type: string
+                  example: "New York"
+                guestEmail:
+                  type: string
+                  example: "johndoe@example.com"
+                guestPhone:
+                  type: string
+                  example: "123-456-7890"
+                guestWhatsapp:
+                  type: string
+                  example: "123-456-7890"
+                guestWebsite:
+                  type: string
+                  example: "https://johndoe.com"
+                guestProblem:
+                  type: string
+                  example: "Anxiety issues"
+                guestVoiceNote:
+                  type: string
+                  example: "https://example.com/voice_note.mp3"
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  example: ["mental health", "consultation"]
+                guestKYC:
+                  type: boolean
+                  example: true
+                expertId:
+                  type: string
+                  description: ID of the expert
+                  example: "615a4c4b8a1a2a001c0f21df"
+                slotId:
+                  type: string
+                  description: ID of the selected slot
+                  example: "615a4c4b8a1a2a001c0f21df"
+                status:
+                  type: string
+                  description: Booking status
+                  enum: ["pending", "confirmed", "canceled"]
+                  example: "Pending"
+      responses:
+        '201':
+          description: Successfully created a new booking
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  guestName:
+                    type: string
+                    example: "John Doe"
+                  dateId:
+                    type: string
+                    example: "615a4c4b8a1a2a001c0f21de"
+                  guestOccupation:
+                    type: string
+                    example: "Engineer"
+                  guestAge:
+                    type: number
+                    example: 30
+                  guestCity:
+                    type: string
+                    example: "New York"
+                  guestEmail:
+                    type: string
+                    example: "johndoe@example.com"
+                  guestPhone:
+                    type: string
+                    example: "123-456-7890"
+                  guestWhatsapp:
+                    type: string
+                    example: "123-456-7890"
+                  guestWebsite:
+                    type: string
+                    example: "https://johndoe.com"
+                  guestProblem:
+                    type: string
+                    example: "Anxiety issues"
+                  guestVoiceNote:
+                    type: string
+                    example: "https://example.com/voice_note.mp3"
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                    example: ["mental health", "consultation"]
+                  guestKYC:
+                    type: boolean
+                    example: true
+                  expertId:
+                    type: string
+                    example: "615a4c4b8a1a2a001c0f21df"
+                  slotId:
+                    type: string
+                    example: "615a4c4b8a1a2a001c0f21df"
+                  status:
+                    type: string
+                    example: "pending"
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                          example: "Invalid guest name"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+                  error:
+                    type: string
+                    example: "Detailed error message"
