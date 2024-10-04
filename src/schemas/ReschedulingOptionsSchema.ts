@@ -19,5 +19,8 @@ import { z } from "zod";
       })
     )
     .min(3, "At least 3 options must be provided"),
-  expiryDate: z.date().optional(), // expiryDate can be optional, as we'll generate it in the backend
+  expiryDate: z.
+  string()
+  .nonempty("Expiry date is required")
+  .transform((str) => new Date(str)), // Transform string to  Date object
 });
