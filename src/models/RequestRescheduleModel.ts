@@ -20,7 +20,7 @@ export interface IReschedulingRequest extends Document {
   CurrentBookingId: mongoose.Schema.Types.ObjectId;
   RequestedDateId: mongoose.Schema.Types.ObjectId;
   RequestedSlotId: mongoose.Schema.Types.ObjectId;
-  // expertId: mongoose.Schema.Types.ObjectId;
+  expertId: mongoose.Schema.Types.ObjectId;
 }
 
 /**
@@ -49,10 +49,10 @@ const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema(
       ref: "Slot",
       required: true,
     },
-    // expertId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Expert",
-    // },
+    expertId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Expert",
+    },
   },
   { timestamps: true }
 );
