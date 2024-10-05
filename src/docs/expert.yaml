@@ -217,3 +217,557 @@ paths:
                     type: string
                     description: The error message.
                     example: "Database connection failed"
+
+  /api/v1/reschedule-request:
+    get:
+      tags:
+        - Expert
+      summary: Get all reschedule requests
+      responses:
+        "200":
+          description: Rescheduling requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Rescheduling requests retrieved successfully
+                  list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        CurrentBookingId:
+                          type: string
+                          format: uuid
+                          description: Object ID of the current booking
+                          example: "66ff8719c63cfbc9d92e4840"
+                        RequestedDateId:
+                          type: string
+                          format: uuid
+                          description: Object ID of the requested date
+                          example: "66f7b92cdf67583ef456a4b1"
+                        RequestedSlotId:
+                          type: string
+                          format: uuid
+                          description: Object ID of the requested slot
+                          example: "66f691ead057d1f45ee2d1c7"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                  error:
+                    type: string
+
+  /api/v1/reschedule-requests/{ExpertId}:
+    get:
+      tags:
+        - Expert
+      summary: Get reschedule requests by expert ID
+      parameters:
+        - name: ExpertId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^[0-9a-fA-F]{24}$"
+          description: The ID of the expert (MongoDB ObjectId)
+      responses:
+        "200":
+          description: Rescheduling requests retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Rescheduling requests retrieved successfully
+                  list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        CurrentBookingId:
+                          type: string
+                          format: uuid
+                          description: Object ID of the current booking
+                          example: "66ff8719c63cfbc9d92e4840"
+                        RequestedDateId:
+                          type: string
+                          format: uuid
+                          description: Object ID of the requested date
+                          example: "66f7b92cdf67583ef456a4b1"
+                        RequestedSlotId:
+                          type: string
+                          format: uuid
+                          description: Object ID of the requested slot
+                          example: "66f691ead057d1f45ee2d1c7"
+                        ExpertName:
+                          type: string
+                          description: Username of the expert
+                          example: "john_doe"
+        "404":
+          description: Expert or rescheduling requests not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Expert not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+                  error:
+                    type: string
+                    example: Detailed error message
+
+  /api/v1/reschedule-requests:
+    get:
+      summary: List all reschedule requests
+      description: Retrieve all reschedule requests for admin.
+      operationId: getRescheduleRequests
+      tags:
+        - Expert
+      # security:
+      #   - BearerAuth: []  # Assuming you're using Bearer token for admin access
+      responses:
+        "200":
+          description: Successful retrieval of rescheduling requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Rescheduling requests retrieved successfully"
+                  list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        CurrentBookingId:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: "60c72b2f9b1e8b0cfcf3b56e"
+                            expertId:
+                              type: object
+                              properties:
+                                username:
+                                  type: string
+                                  example: "expert_username"
+                        RequestedDateId:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                              example: "2024-10-05"
+                        RequestedSlotId:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: "60c72b2f9b1e8b0cfcf3b56f"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+                  error:
+                    type: string
+                    example: "Error details here"
+
+  /api/v1/handle-Reschedule:
+    post:
+      summary: Handle reschedule requests
+      description: Accept or reject reschedule requests for bookings.
+      operationId: handleReschedule
+      tags:
+        - Expert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                CurrentBookingId:
+                  type: string
+                  format: uuid
+                  example: "60c72b2f9b1e8b0cfcf3b56e"
+                RequestedDateId:
+                  type: string
+                  format: uuid
+                  example: "60c72b2f9b1e8b0cfcf3b570"
+                RequestedSlotId:
+                  type: string
+                  format: uuid
+                  example: "60c72b2f9b1e8b0cfcf3b580"
+                action:
+                  type: string
+                  enum: [accepted, rejected]
+                  example: "accepted"
+                newDate:
+                  type: string
+                  format: date
+                  example: "2024-10-05"
+      responses:
+        "200":
+          description: Successfully handled reschedule request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Reschedule request accepted successfully"
+                  booking:
+                    type: object
+                    properties:
+                      CurrentBookingId:
+                        type: string
+                        example: "60c72b2f9b1e8b0cfcf3b56e"
+                      RequestedDateId:
+                        type: string
+                        example: "60c72b2f9b1e8b0cfcf3b570"
+                      RequestedSlotId:
+                        type: string
+                        example: "60c72b2f9b1e8b0cfcf3b580"
+        "400":
+          description: Invalid date or slot ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid date or slot ID"
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Booking not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Internal server error"
+                  error:
+                    type: string
+                    example: "Error details here"
+
+  /api/v1/plan/create:
+    post:
+      summary: Create a new plan
+      description: This endpoint creates a new plan based on the provided data.
+      operationId: createPlan
+      tags:
+        - Expert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  example: "phone15"
+                  description: "Name must be at least 3 characters."
+                channel:
+                  type: string
+                  minLength: 3
+                  example: "phone"
+                  description: "Channel must be at least 3 characters."
+                duration:
+                  type: number
+                  minimum: 1
+                  example: 15
+                  description: "Duration must be at least 1 minute."
+                price:
+                  type: string
+                  pattern: "^\\d+(\\.\\d{1,2})?$"
+                  example: "1500.00"
+                  description: "Invalid price format (e.g., 100.00)."
+                bookingType:
+                  type: string
+                  minLength: 3
+                  example: "appointment"
+                  description: "Booking type must be at least 3 characters."
+                expertId:
+                  type: string
+                  minLength: 24
+                  maxLength: 24
+                  example: "60c72b2f9b1e8b0cfcf3b56e"
+                  description: "Invalid Expert ID format."
+                isDedicated:
+                  type: boolean
+                  example: true
+                  description: "Optional field indicating if the plan is dedicated."
+              required:
+                - name
+                - channel
+                - duration
+                - price
+                - bookingType
+                - expertId
+      responses:
+        "201":
+          description: Successfully created plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60c72b2f9b1e8b0cfcf3b56e"
+                  name:
+                    type: string
+                    example: "phone15"
+                  channel:
+                    type: string
+                    example: "phone"
+                  duration:
+                    type: number
+                    example: 15
+                  price:
+                    type: string
+                    example: "1500.00"
+                  bookingType:
+                    type: string
+                    example: "appointment"
+                  expertId:
+                    type: string
+                    example: "60c72b2f9b1e8b0cfcf3b56e"
+                  isDedicated:
+                    type: boolean
+                    example: true
+        "400":
+          description: Validation errors or bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                          example: "price"
+                        message:
+                          type: string
+                          example: "Invalid price format (e.g. 100.00)."
+                  error:
+                    type: string
+                    example: "Invalid data format."
+
+  /api/v1/{id}:
+    put:
+      summary: Update a plan by ID
+      description: This endpoint updates a plan using its ID and the provided updated data.
+      operationId: updatePlanById
+      tags:
+        - Expert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the plan to be updated
+          schema:
+            type: string
+            example: "60c72b2f9b1e8b0cfcf3b56e"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  example: "Updated Plan"
+                  description: "Name must be at least 3 characters."
+                channel:
+                  type: string
+                  minLength: 3
+                  example: "gmeet"
+                  description: "Channel must be at least 3 characters."
+                duration:
+                  type: number
+                  minimum: 1
+                  example: 45
+                  description: "Duration must be at least 1 minute."
+                price:
+                  type: string
+                  pattern: "^\\d+(\\.\\d{1,2})?$"
+                  example: "3500.00"
+                  description: "Invalid price format (e.g., 100.00)."
+                bookingType:
+                  type: string
+                  minLength: 3
+                  example: "appointment"
+                  description: "Booking type must be at least 3 characters."
+                expertId:
+                  type: string
+                  minLength: 24
+                  maxLength: 24
+                  example: "60c72b2f9b1e8b0cfcf3b56e"
+                  description: "Invalid Expert ID format."
+                isDedicated:
+                  type: boolean
+                  example: false
+                  description: "Optional field indicating if the plan is dedicated."
+      responses:
+        "200":
+          description: Successfully updated plan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "60c72b2f9b1e8b0cfcf3b56e"
+                  name:
+                    type: string
+                    example: "Updated Plan"
+                  channel:
+                    type: string
+                    example: "gmeet"
+                  duration:
+                    type: number
+                    example: 45
+                  price:
+                    type: string
+                    example: "3500.00"
+                  bookingType:
+                    type: string
+                    example: "gmeet45"
+                  expertId:
+                    type: string
+                    example: "60c72b2f9b1e8b0cfcf3b56e"
+                  isDedicated:
+                    type: boolean
+                    example: false
+        "404":
+          description: Plan not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Plan not found."
+        "400":
+          description: Validation errors or bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                          example: "price"
+                        message:
+                          type: string
+                          example: "Invalid price format (e.g. 100.00)."
+                  error:
+                    type: string
+                    example: "Invalid data format."
+
+  /api/v1/plan/{id}:
+    delete:
+      summary: Delete a plan by ID
+      description: This endpoint deletes a plan using its ID.
+      operationId: deletePlanById
+      tags:
+        - Expert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the plan to be deleted
+          schema:
+            type: string
+            example: "60c72b2f9b1e8b0cfcf3b56e"
+      responses:
+        "204":
+          description: plan deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Plan deleted successfully."
+        "404":
+          description: Plan not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Plan not found."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error."

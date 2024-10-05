@@ -19,6 +19,8 @@ export enum Status {
   COMPLETED = "Completed",
   CANCELLED = "Cancelled",
   RESCHEDULED = "Rescheduled",
+  // Add more statuses as needed
+  REJECTED= "Rejected"
 }
 
 /**

@@ -20,5 +20,5 @@ export const ReschedulingRequestSchemaZod = z.object({
   // RequestedBy: z.enum([RequestedBy.USER, RequestedBy.EXPERT]),
   RequestedDateId: z.string().length(24, "Invalid date ID format"),
   RequestedSlotId: z.string().length(24, "Invalid slots ID format"),
-  // expertId: z.string().length(24, "Invalid expert ID format")
+  expertId: z.string().length(24, "Invalid expert ID format")
 });
