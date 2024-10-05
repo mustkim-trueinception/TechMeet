@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 // import { RequestedBy } from '../models/requestReschedule';
 
 /**
@@ -17,8 +17,7 @@ import { z } from "zod";
 
 export const ReschedulingRequestSchemaZod = z.object({
   CurrentBookingId: z.string().length(24, "Invalid booking ID format"),
-  // RequestedBy: z.enum([RequestedBy.USER, RequestedBy.EXPERT]),
-  RequestedDateId: z.string().length(24, "Invalid date ID format"),
-  RequestedSlotId: z.string().length(24, "Invalid slots ID format"),
+  RequestedDateId: z.string().length(24, "Invalid date ID format").optional(),
+  RequestedSlotId: z.string().length(24, "Invalid slots ID format").optional(),
   expertId: z.string().length(24, "Invalid expert ID format")
 });

@@ -303,13 +303,7 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
  */
 
 router.post("/handle-Reschedule", async (req: Request, res: Response) => {
-  const {
-    CurrentBookingId,
-    RequestedDateId,
-    RequestedSlotId,
-    action,
-    newDate,
-  } = req.body;
+  const { CurrentBookingId, RequestedDateId, RequestedSlotId, action } = req.body;
 
   try {
     // Check if the booking exists
@@ -318,8 +312,9 @@ router.post("/handle-Reschedule", async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
+    // Handle the case for "accepted" action
     if (action === "accepted") {
-      // Validate the requestedDateId and requestedSlotId
+      // Validate the requested date and slot IDs
       if (
         !mongoose.Types.ObjectId.isValid(RequestedDateId) ||
         !mongoose.Types.ObjectId.isValid(RequestedSlotId)
@@ -327,74 +322,46 @@ router.post("/handle-Reschedule", async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid date or slot ID" });
       }
 
-      // Update the booking with new date and slot
+      // Update the booking with new date, slot, and status
       booking.dateId = RequestedDateId;
       booking.slotId = RequestedSlotId;
-      booking.status = Status.RESCHEDULED; // Update the status using the enum
+      booking.status = Status.RESCHEDULED; // Update the status to "RESCHEDULED"
 
       await booking.save();
 
-      // // Optionally, delete the rescheduling request if it was accepted
-      // await ReschedulingRequest.deleteOne({
-      //   CurrentBookingId: CurrentBookingId,
-      // });
+      // Optionally, delete the rescheduling request
+      await ReschedulingRequest.deleteOne({ CurrentBookingId });
 
-      await ReschedulingRequest.create({
-        CurrentBookingId,
-        RequestedDateId,
-        RequestedSlotId,
-        newDate,
-      });
-
-      // Send the response
-      res.status(200).json({
+      // Return success response
+      return res.status(200).json({
         message: "Reschedule request accepted successfully",
         booking,
       });
-    } else if (action === "rejected") {
-      // Optionally, delete the rescheduling request if it was rejected
-      await ReschedulingRequest.deleteOne({
-        CurrentBookingId: CurrentBookingId,
-      });
+    } 
+    
+    // Handle the case for "rejected" action
+    else if (action === "rejected") {
+      // Optionally, delete the rescheduling request
+      await ReschedulingRequest.deleteOne({ CurrentBookingId });
 
+      // Update the booking status to "REJECTED"
       booking.status = Status.REJECTED;
       await booking.save();
 
-      // Send the response
-      res.status(200).json({
+      // Return success response
+      return res.status(200).json({
         message: "Reschedule request rejected successfully",
       });
+    } 
+    
+    // Handle invalid action cases
+    else {
+      return res.status(400).json({ message: "Invalid action" });
     }
   } catch (error) {
     console.error("Error handling reschedule request:", error);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
-
-//       return res.status(200).json({
-//         message: "Reschedule request accepted successfully",
-//         booking,
-//       });
-//     } else if (action === "rejected") {
-//       // Optionally, delete the rescheduling request if it was rejected
-//       await ReschedulingRequest.deleteOne({
-//         CurrentBookingId: CurrentBookingId,
-//       });
-
-//       return res.status(200).json({
-//         message: "Reschedule request rejected successfully",
-//       });
-//     } else {
-//       return res.status(400).json({ message: "Invalid action" });
-//     }
-//   } catch (error) {
-//     console.error("Error handling reschedule request:", error);
-//     return res
-//       .status(500)
-//       .json({ message: "Internal server error", error: error.message });
-//   }
-// });
 
 export default router;
