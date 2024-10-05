@@ -18,8 +18,8 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IReschedulingRequest extends Document {
   CurrentBookingId: mongoose.Schema.Types.ObjectId;
-  RequestedDateId: mongoose.Schema.Types.ObjectId;
-  RequestedSlotId: mongoose.Schema.Types.ObjectId;
+  RequestedDateId?: mongoose.Schema.Types.ObjectId;
+  RequestedSlotId?: mongoose.Schema.Types.ObjectId;
   expertId: mongoose.Schema.Types.ObjectId;
 }
 
@@ -42,12 +42,13 @@ const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema(
     RequestedDateId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Date",
-      required: true,
+      required: false,
+      
     },
     RequestedSlotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Slot",
-      required: true,
+      required: false,
     },
     expertId: {
       type: mongoose.Schema.Types.ObjectId,
