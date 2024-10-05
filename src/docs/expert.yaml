@@ -405,11 +405,10 @@ paths:
 
   /api/v1/handle-Reschedule:
     post:
-      summary: Handle reschedule requests
-      description: Accept or reject reschedule requests for bookings.
-      operationId: handleReschedule
       tags:
         - Expert
+      summary: Accept or reject a reschedule request
+      description: Handle the reschedule request by either accepting or rejecting it based on the action provided.
       requestBody:
         required: true
         content:
@@ -419,27 +418,24 @@ paths:
               properties:
                 CurrentBookingId:
                   type: string
-                  format: uuid
-                  example: "60c72b2f9b1e8b0cfcf3b56e"
+                  description: The ID of the current booking to reschedule
+                  example: "615d0a5ef4b6ec0015f9b9b7"
                 RequestedDateId:
                   type: string
-                  format: uuid
-                  example: "60c72b2f9b1e8b0cfcf3b570"
+                  description: The ID of the requested new date (required if action is "accepted")
+                  example: "615d0a5ef4b6ec0015f9b9b8"
                 RequestedSlotId:
                   type: string
-                  format: uuid
-                  example: "60c72b2f9b1e8b0cfcf3b580"
+                  description: The ID of the requested new slot (required if action is "accepted")
+                  example: "615d0a5ef4b6ec0015f9b9b9"
                 action:
                   type: string
                   enum: [accepted, rejected]
-                  example: "accepted"
-                newDate:
-                  type: string
-                  format: date
-                  example: "2024-10-05"
+                  description: The action to either accept or reject the reschedule request
+                  example: accepted
       responses:
         "200":
-          description: Successfully handled reschedule request
+          description: Successful response when reschedule request is accepted or rejected
           content:
             application/json:
               schema:
@@ -447,21 +443,25 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Reschedule request accepted successfully"
+                    example: Reschedule request accepted successfully
                   booking:
                     type: object
+                    description: The updated booking object (only when accepted)
                     properties:
                       CurrentBookingId:
                         type: string
-                        example: "60c72b2f9b1e8b0cfcf3b56e"
+                        example: "615d0a5ef4b6ec0015f9b9b7"
                       RequestedDateId:
                         type: string
-                        example: "60c72b2f9b1e8b0cfcf3b570"
+                        example: "615d0a5ef4b6ec0015f9b9b8"
                       RequestedSlotId:
                         type: string
-                        example: "60c72b2f9b1e8b0cfcf3b580"
+                        example: "615d0a5ef4b6ec0015f9b9b9"
+                      status:
+                        type: string
+                        example: RESCHEDULED
         "400":
-          description: Invalid date or slot ID
+          description: Invalid request or validation error (e.g., invalid date or slot ID)
           content:
             application/json:
               schema:
@@ -469,7 +469,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid date or slot ID"
+                    example: Invalid date or slot ID
         "404":
           description: Booking not found
           content:
@@ -479,7 +479,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Booking not found"
+                    example: Booking not found
         "500":
           description: Internal server error
           content:
@@ -489,10 +489,10 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Internal server error"
+                    example: Internal server error
                   error:
                     type: string
-                    example: "Error details here"
+                    example: Error details here
 
   /api/v1/plan/create:
     post:
