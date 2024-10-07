@@ -51,6 +51,9 @@ router.get("/slots", async (req: Request, res: Response) => {
   try {
     const slots = await Slot.find();
     res.status(200).json(slots);
+    if (!slots) {
+      return res.status(404).json({ error: "Slots not found" });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -91,7 +94,7 @@ router.get("/slot/:expert_Id", async (req: Request, res: Response) => {
  * @description Update a slot by ID.
  */
 
-router.put("/slot:id", async (req: Request, res: Response) => {
+router.put("/slot/:id", async (req: Request, res: Response) => {
   try {
     // Validate the request body using Zod
     const parsedData = SlotSchemaZod.partial().parse(req.body); // Allow partial updates
@@ -123,13 +126,15 @@ router.put("/slot:id", async (req: Request, res: Response) => {
  * @description Delete a slot by ID.
  */
 
-router.delete("/slot:id", async (req: Request, res: Response) => {
+router.delete("/delete/slot/:id", async (req: Request, res: Response) => {
   try {
     const slot = await Slot.findByIdAndDelete(req.params.id);
     if (!slot) {
       return res.status(404).json({ error: "Slot not found" });
     }
-    res.status(204).send();
+    res.status(204).json({
+      message: "Slot deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
