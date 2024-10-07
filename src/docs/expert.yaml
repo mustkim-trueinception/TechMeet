@@ -771,3 +771,505 @@ paths:
                   error:
                     type: string
                     example: "Internal server error."
+
+  /api/v1/date/{id}:
+    put:
+      summary: Update a date entry by ID
+      description: Updates the date entry with the specified ID. Allows partial updates of the date entry's fields.
+      tags:
+        - Expert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the date entry to update
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                  example: "01/01/2024"
+                availability:
+                  type: string
+                  enum: ["holiday", "available", "not available", "booked"]
+                expertId:
+                  type: string
+                slotsId:
+                  type: array
+                  items:
+                    type: string
+              required: []
+      responses:
+        "200":
+          description: The updated date entry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  availability:
+                    type: string
+                    enum: ["holiday", "available", "not available", "booked"]
+                  expertId:
+                    type: string
+                  slotsId:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: Date entry not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/date/{date_Id}:
+    delete:
+      summary: Delete a date entry by ID
+      description: Deletes the date entry with the specified ID.
+      tags:
+        - Expert
+      parameters:
+        - name: date_Id
+          in: path
+          required: true
+          description: The ID of the date entry to delete
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Data entry deleted successfully
+        "404":
+          description: Date entry not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/expert/date/create:
+    post:
+      summary: Create and fetch date entries for a given plan
+      description: Creates a new date entry for a given plan, and returns all date entries with their slots for the expert.
+      tags:
+        - Expert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan_id:
+                  type: string
+                  description: The ID of the plan
+              required:
+                - plan_id
+      responses:
+        "200":
+          description: Success - Returns dates with their slots for the specified plan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the date entry
+                    date:
+                      type: string
+                      description: The date in "DD/MM/YYYY" format
+                    availability:
+                      type: string
+                      description: Availability status of the date
+                    slots:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The ID of the slot
+                          availability:
+                            type: string
+                            description: Availability status of the slot
+                          timing:
+                            type: string
+                            description: Timing of the slot
+                          period:
+                            type: string
+                            description: Period of the slot
+                          expertId:
+                            type: string
+                            description: ID of the associated expert
+                          planId:
+                            type: string
+                            description: ID of the associated plan
+        "404":
+          description: Plan or Expert not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/slot/create:
+    post:
+      tags:
+        - Expert
+      summary: Create a new slot
+      description: Create a new slot based on the provided slot data
+      operationId: createSlot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timing:
+                  type: string
+                  description: Timing of the slot
+                availability:
+                  type: string
+                  description: Availability status of the slot
+                  enum:
+                    - available
+                    - booked
+                    - not available
+                period:
+                  type: string
+                  description: Period of the slot
+                expertId:
+                  type: string
+                  description: ID of the expert associated with the slot
+                planId:
+                  type: string
+                  description: ID of the plan associated with the slot
+              required:
+                - timing
+                - availability
+                - period
+                - expertId
+                - planId
+      responses:
+        "201":
+          description: Slot created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  timing:
+                    type: string
+                  availability:
+                    type: string
+                  period:
+                    type: string
+                  expertId:
+                    type: string
+                  planId:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                        message:
+                          type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/slots:
+    get:
+      tags:
+        - Expert
+      summary: Retrieve all slots
+      description: Fetch all available slot entries
+      operationId: getSlots
+      responses:
+        "200":
+          description: Successful response containing all slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    timing:
+                      type: string
+                    availability:
+                      type: string
+                    period:
+                      type: string
+                    expertId:
+                      type: string
+                    planId:
+                      type: string
+        "404":
+          description: Slots not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/slot/{expert_Id}:
+    get:
+      tags:
+        - Expert
+      summary: Get a slot by expert ID
+      description: Retrieve slot(s) associated with the specified expert ID
+      operationId: getSlotByExpertId
+      parameters:
+        - name: expert_Id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The expert ID to find the slot
+      responses:
+        "200":
+          description: Found slot object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    timing:
+                      type: string
+                    availability:
+                      type: string
+                    period:
+                      type: string
+                    expertId:
+                      type: string
+                    planId:
+                      type: string
+        "404":
+          description: Slot not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/slot/{id}:
+    put:
+      tags:
+        - Expert
+      summary: Update a slot by ID
+      description: Update slot details based on the slot ID
+      operationId: updateSlotById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the slot to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timing:
+                  type: string
+                availability:
+                  type: string
+                period:
+                  type: string
+                expertId:
+                  type: string
+                planId:
+                  type: string
+      responses:
+        "200":
+          description: Updated slot object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  timing:
+                    type: string
+                  availability:
+                    type: string
+                  period:
+                    type: string
+                  expertId:
+                    type: string
+                  planId:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+        "404":
+          description: Slot not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/v1/delete/slot/{id}:
+    delete:
+      tags:
+        - Expert
+      summary: Delete a slot by ID
+      description: Deletes a slot from the system based on the provided ID.
+      operationId: deleteSlotById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the slot to delete
+      responses:
+        "204":
+          description: Slot deleted successfully
+        "404":
+          description: Slot not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
