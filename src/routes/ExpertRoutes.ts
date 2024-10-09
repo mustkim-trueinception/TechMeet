@@ -166,96 +166,51 @@ router.delete("/expert/:id", async (req: Request, res: Response) => {
  * @param {Response} res - Express response object, returns reschedule requests
  */
 
-router.get("/reschedule-request", async (req: Request, res: Response) => {
-  try {
-    // Fetch all rescheduling requests without populating the entire document
-    const requests = await ReschedulingRequest.find();
-
-    // Send the response with only the required fields
-    const formattedRequests = requests.map((request) => ({
-      CurrentBookingId: request.CurrentBookingId,
-      RequestedDateId: request.RequestedDateId,
-      RequestedSlotId: request.RequestedSlotId,
-    }));
-
-    res.status(200).json({
-      message: "Rescheduling requests retrieved successfully",
-      list: requests,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error", error });
-  }
-});
-
-/**
- * @route GET /reschedule-requests/:ExpertId
- * @description List reschedule requests by expert ID
- * @access Public
- * @param {Request} req - Express request object, expert ID in the params
- * @param {Response} res - Express response object, returns reschedule requests for the expert
- */
-
 router.get(
-  "/reschedule-requests/:ExpertId",
+  "/expert/rescheduleRequests",
   async (req: Request, res: Response) => {
-    const { ExpertId } = req.params; // Extract expert ID from request parameters
-    console.log(`Expert ID: ${ExpertId}`);
-
     try {
-      // Check if the expert exists in the database
-      const expert = await Expert.findById(ExpertId).select("username"); // Only select the username field
-      if (!expert) {
-        return res.status(404).json({ message: "Expert not found" });
-      }
+      // Fetch all rescheduling requests without populating the entire document
+      const requests = await ReschedulingRequest.find();
 
-      // Fetch rescheduling requests associated with the specified expert ID
-      const requests = await ReschedulingRequest.find({ expertId: ExpertId }) // Ensure the expertId field exists in ReschedulingRequest schema
-        .populate("CurrentBookingId") // Populate booking details if needed
-        .populate("RequestedDateId") // Populate date details if needed
-        .populate("RequestedSlotId"); // Populate slot details if needed
-
-      // If no requests are found
-      if (requests.length === 0) {
-        return res
-          .status(404)
-          .json({ message: "No reschedule requests found for this expert" });
-      }
-
-      // Format the response to include the necessary fields
+      // Send the response with only the required fields
       const formattedRequests = requests.map((request) => ({
-        CurrentBookingId: request.CurrentBookingId, // Include the booking ID or details
-        RequestedDateId: request.RequestedDateId, // Include the requested date
-        RequestedSlotId: request.RequestedSlotId, // Include the requested slot
-        ExpertName: expert.username, // Include the expert's username
+        CurrentBookingId: request.CurrentBookingId,
+        RequestedDateId: request.RequestedDateId,
+        RequestedSlotId: request.RequestedSlotId,
       }));
 
-      // Send the response
       res.status(200).json({
         message: "Rescheduling requests retrieved successfully",
-        list: formattedRequests, // Return the formatted requests
+        list: requests,
       });
     } catch (error) {
-      console.error("Error fetching reschedule requests:", error);
-      res
-        .status(500)
-        .json({ message: "Internal server error", error: error.message });
+      console.error(error);
+      res.status(500).json({ message: "Internal server error", error });
     }
   }
 );
 
 /**
- * @route GET /reschedule-requests
- * @description List all reschedule requests (for admin)
- * @access Admin
- * @param {Request} req - Express request object
- * @param {Response} res - Express response object, returns all reschedule requests
+ * @route GET /reschedule-requests/:ExpertId
+ * @description List reschedule requests by expert ID
+ * @access Public
+//  * @param {Request} req - Express request object, expert ID in the params
+//  * @param {Response} res - Express response object, returns reschedule requests for the expert
  */
 
-router.get("/reschedule-requests", async (req: Request, res: Response) => {
+router.get("/Requests/:ExpertId", async (req: Request, res: Response) => {
+  const ExpertId = req.params.ExpertId; // Extract expert ID from request parameters
+
   try {
-    // Fetch all rescheduling requests and populate the expert's username
-    const requests = await ReschedulingRequest.find()
+    // Check if the expert exists in the database
+    const expert = await Expert.findById(ExpertId).select("username"); // Only select the username field
+    if (!expert) {
+      return res.status(404).json({ message: "Expert not found" });
+    }
+
+    // Fetch rescheduling requests associated with the specified expert ID
+    const requests = await ReschedulingRequest.find() // Ensure the expertId field exists in ReschedulingRequest schema
       .populate({
         path: "CurrentBookingId",
         select: "_Id",
@@ -265,26 +220,28 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
           select: "username",
         },
       })
-      .populate({
-        path: "RequestedDateId",
-        select: "date", // Populate date details if needed
-      })
-      .populate({
-        path: "RequestedSlotId",
-        select: "_Id", // Populate slot details if needed
-      });
-    console.log(requests);
+      .populate("RequestedDateId") // Populate date details if needed
+      .populate("RequestedSlotId"); // Populate slot details if needed
 
-    // Format the response to include only the required fields
+    // If no requests are found
+    if (requests.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No reschedule requests found for this expert" });
+    }
+
+    // Format the response to include the necessary fields
     const formattedRequests = requests.map((request) => ({
-      CurrentBookingId: request.CurrentBookingId, // Include the relevant fields
-      RequestedDateId: request.RequestedDateId,
-      RequestedSlotId: request.RequestedSlotId,
+      CurrentBookingId: request.CurrentBookingId, // Include the booking ID or details
+      RequestedDateId: request.RequestedDateId, // Include the requested date
+      RequestedSlotId: request.RequestedSlotId, // Include the requested slot
+      ExpertName: expert.username, // Include the expert's username
     }));
 
+    // Send the response
     res.status(200).json({
       message: "Rescheduling requests retrieved successfully",
-      list: formattedRequests, // Return the formatted data
+      list: formattedRequests, // Return the formatted requests
     });
   } catch (error) {
     console.error("Error fetching reschedule requests:", error);
@@ -303,7 +260,8 @@ router.get("/reschedule-requests", async (req: Request, res: Response) => {
  */
 
 router.post("/handle-Reschedule", async (req: Request, res: Response) => {
-  const { CurrentBookingId, RequestedDateId, RequestedSlotId, action } = req.body;
+  const { CurrentBookingId, RequestedDateId, RequestedSlotId, action } =
+    req.body;
 
   try {
     // Check if the booking exists
@@ -312,7 +270,6 @@ router.post("/handle-Reschedule", async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Handle the case for "accepted" action
     if (action === "accepted") {
       // Validate the requested date and slot IDs
       if (
@@ -322,45 +279,45 @@ router.post("/handle-Reschedule", async (req: Request, res: Response) => {
         return res.status(400).json({ message: "Invalid date or slot ID" });
       }
 
-      // Update the booking with new date, slot, and status
-      booking.dateId = RequestedDateId;
-      booking.slotId = RequestedSlotId;
-      booking.status = Status.RESCHEDULED; // Update the status to "RESCHEDULED"
+      // Nayi booking create karna using existing booking details and updated fields
+      const newBookingData = {
+        ...booking.toObject(), // Saari fields copy karo existing booking se
+        dateId: RequestedDateId,
+        slotId: RequestedSlotId,
+        status: Status.RESCHEDULED, // Valid status value set karo
+        rescheduledBookingId: CurrentBookingId, // Reference to the old booking
+      };
+      delete newBookingData._id; // Remove the existing _id from the new booking data
+      // Nayi booking create karo
+      const newBooking = await BookingSchema.create(newBookingData);
 
-      await booking.save();
+      // Purani booking ko delete karo
+      await BookingSchema.findByIdAndDelete(CurrentBookingId);
 
-      // Optionally, delete the rescheduling request
+      // Optionally, rescheduling request delete karo
       await ReschedulingRequest.deleteOne({ CurrentBookingId });
 
-      // Return success response
+      // Success response bhejo
       return res.status(200).json({
         message: "Reschedule request accepted successfully",
-        booking,
+        booking: newBooking,
       });
-    } 
-    
-    // Handle the case for "rejected" action
-    else if (action === "rejected") {
-      // Optionally, delete the rescheduling request
+    } else if (action === "rejected") {
+      // Rescheduling request delete karo
       await ReschedulingRequest.deleteOne({ CurrentBookingId });
 
-      // Update the booking status to "REJECTED"
-      booking.status = Status.REJECTED;
-      await booking.save();
-
-      // Return success response
+      // Success response bhejo
       return res.status(200).json({
         message: "Reschedule request rejected successfully",
       });
-    } 
-    
-    // Handle invalid action cases
-    else {
+    } else {
       return res.status(400).json({ message: "Invalid action" });
     }
   } catch (error) {
     console.error("Error handling reschedule request:", error);
-    return res.status(500).json({ message: "Internal server error", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 
