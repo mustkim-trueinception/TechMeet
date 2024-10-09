@@ -278,7 +278,6 @@ paths:
           required: true
           schema:
             type: string
-            pattern: "^[0-9a-fA-F]{24}$"
           description: The ID of the expert (MongoDB ObjectId)
       responses:
         "200":

@@ -1,12 +1,21 @@
+import { ReschedulingOptions } from "./ReschedulingOptionsModel";
+import { Request } from "express";
 import mongoose, { Schema, Document } from "mongoose";
 
 // Request Reschedule by user /guest /client
 
 // Define enum for requested by
-// export enum RequestedBy {
-//   USER = 'User',
-//   EXPERT = 'Expert'
-// }
+export enum RequestedBy {
+  USER = "User",
+  EXPERT = "Expert",
+}
+
+// Define enum for Options
+export enum Options {
+  Option_1 = "Option 1",
+  Option_2 = "Option 2",
+  Option_3 = "Option 3",
+}
 
 /**
  * @interface IReschedulingRequest
@@ -18,9 +27,11 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IReschedulingRequest extends Document {
   CurrentBookingId: mongoose.Schema.Types.ObjectId;
+  RequestedBy: RequestedBy;
   RequestedDateId?: mongoose.Schema.Types.ObjectId;
   RequestedSlotId?: mongoose.Schema.Types.ObjectId;
-  expertId: mongoose.Schema.Types.ObjectId;
+  ReschedulingId: mongoose.Schema.Types.ObjectId;
+  SelectedOption: Options;
 }
 
 /**
@@ -39,21 +50,32 @@ const reschedulingRequestSchema: Schema<IReschedulingRequest> = new Schema(
       ref: "Booking",
       required: true,
     },
+    RequestedBy: {
+      type: String,
+      enum: Object.values(RequestedBy),
+      required: true,
+    },
     RequestedDateId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Date",
       required: false,
-      
     },
     RequestedSlotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Slot",
       required: false,
     },
-    expertId: {
+    ReschedulingId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Expert",
     },
+    SelectedOption: {
+      type: String,
+      enum: Object.values(Options),
+    },
+    // expertId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Expert",
+    // },
   },
   { timestamps: true }
 );

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import AdminSchema from "../models/AdminModel";
+import { ReschedulingRequest } from "../models/RequestRescheduleModel";
 
 const router = express.Router();
 
@@ -79,6 +80,56 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(400).json({ message: error.message });
     }
     return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+/**
+ * @route GET /reschedule-requests
+ * @description List all reschedule requests (for admin)
+ * @access Admin
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object, returns all reschedule requests
+ */
+
+router.get("/admin/rescheduleRequests", async (req: Request, res: Response) => {
+  try {
+    // Fetch all rescheduling requests and populate the expert's username
+    const requests = await ReschedulingRequest.find()
+      .populate({
+        path: "CurrentBookingId",
+        select: "_Id",
+        populate: {
+          path: "expertId",
+          model: "Expert",
+          select: "username",
+        },
+      })
+      .populate({
+        path: "RequestedDateId",
+        select: "date", // Populate date details if needed
+      })
+      .populate({
+        path: "RequestedSlotId",
+        select: "_Id", // Populate slot details if needed
+      });
+    console.log(requests);
+
+    // Format the response to include only the required fields
+    const formattedRequests = requests.map((request) => ({
+      CurrentBookingId: request.CurrentBookingId, // Include the relevant fields
+      RequestedDateId: request.RequestedDateId,
+      RequestedSlotId: request.RequestedSlotId,
+    }));
+
+    res.status(200).json({
+      message: "Rescheduling requests retrieved successfully",
+      list: formattedRequests, // Return the formatted data
+    });
+  } catch (error) {
+    console.error("Error fetching reschedule requests:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 });
 
