@@ -1,13 +1,19 @@
 // Middleware for JWT auhentication
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+export const authenticateJWT = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.header("Authorization")?.split(" ")[1];
 
-// validation for token
+  // validation for token
   if (!token) {
-    return res.status(403).json({ message: 'Access denied. No token provided.' });
+    return res
+      .status(403)
+      .json({ message: "Access denied. No token provided." });
   }
 
   try {
@@ -16,6 +22,6 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
     (req as any).user = decoded; // Add decoded token data to request object
     next();
   } catch (error) {
-    res.status(400).json({ message: 'Invalid token.' });
+    res.status(401).json({ message: "Invalid token." });
   }
 };
