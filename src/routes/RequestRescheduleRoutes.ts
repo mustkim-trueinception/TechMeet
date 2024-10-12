@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { ReschedulingRequestSchemaZod } from "../schemas/RequestRescheduleSchema";
 import { ReschedulingRequest } from "../models/RequestRescheduleModel";
 import { z } from "zod";
+import { authenticateJWT } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -13,7 +14,10 @@ const router = express.Router();
  * @param {string} req.body.RequestedDateId - The ID of the requested new date (must be a valid ObjectId)
  * @param {string} req.body.RequestedSlotId - The ID of the requested new slot (must be a valid ObjectId)
  * @returns {object} 201 - Rescheduling request created successfully
- * @returns {object} 400 - Bad request, rescheduling request already exists or validation errors
+ * @returns {object} 400 - Bad request, validation errors
+ * @returns {object} 401 - Unauthorized, invalid token
+ * @returns {object} 403 - No token provided
+ * @returns {object} 409 - Conflict, rescheduling request already exists
  * @returns {object} 500 - Internal server error
  * @example
  * Request body example
@@ -23,8 +27,7 @@ const router = express.Router();
  *   "RequestedSlotId": "5f50c31b52bdbb0012d95a61"
  * }
  */
-
-router.post("/reschedule", async (req: Request, res: Response) => {
+router.post("/reschedule", authenticateJWT, async (req: Request, res: Response) => {
   try {
     // Validate request body with Zod schema
     const validatedData = ReschedulingRequestSchemaZod.parse(req.body);
@@ -37,7 +40,7 @@ router.post("/reschedule", async (req: Request, res: Response) => {
       RequestedSlotId: validatedData.RequestedSlotId,
     });
     if (reschedulingRequestExists) {
-      return res.status(400).json({
+      return res.status(409).json({
         message: "Rescheduling request already exists",
       });
     }
