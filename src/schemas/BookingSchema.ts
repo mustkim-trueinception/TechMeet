@@ -1,4 +1,3 @@
-// import { updateGuestSchema } from './../routes/BookingRoutes';
 import { z } from "zod";
 
 /**
@@ -24,7 +23,7 @@ export const StatusEnum = z.enum([
 
 /**
  * Zod schema for validating booking data.
- * 
+ *
  * @property {string} guestName - Name of the guest, required and must be a non-empty string.
  * @property {string} dateId - The ID of the selected date, required and must be a non-empty string.
  * @property {("Student" | "Businessperson" | "Working Professional")} guestOccupation - Occupation of the guest, restricted to specific values.
