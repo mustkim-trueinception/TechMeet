@@ -73,7 +73,11 @@ router.get("/experts", authenticateJWT, async (req: Request, res: Response) => {
  */
 router.get("/guest/experts", async (req: Request, res: Response) => {
   try {
-    const experts = await Expert.find();
+    const experts = await Expert.find()
+      .select(
+        "username fullname expertise designation description avatar coverPhoto"
+      )
+      .lean(); // Ensures no extra fields or metadata;
     res.status(200).json(experts);
   } catch (error) {
     res.status(500).json({ error: error.message });
