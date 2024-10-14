@@ -77,23 +77,17 @@ router.get(
  * @returns {Error} 404 - No plans found for this expert
  * @returns {Error} 500 - Internal server error
  */
-router.get(
-  "/plan/:expert_id",
-  authenticateJWT,
-  async (req: Request, res: Response) => {
-    try {
-      const plans = await Plan.find({ expertId: req.params.expert_id });
-      if (!plans || plans.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "No plans found for this expert" });
-      }
-      res.status(200).json(plans);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+router.get("/plan/:expert_id", async (req: Request, res: Response) => {
+  try {
+    const plans = await Plan.find({ expertId: req.params.expert_id });
+    if (!plans || plans.length === 0) {
+      return res.status(404).json({ error: "No plans found for this expert" });
     }
+    res.status(200).json(plans);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-);
+});
 
 /**
  * @route PUT /plan/:id

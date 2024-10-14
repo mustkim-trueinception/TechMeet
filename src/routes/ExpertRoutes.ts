@@ -108,6 +108,29 @@ router.get(
 );
 
 /**
+ * @route GET /expert/:id
+ * @description Get an expert by ID
+ * @access Private
+ * @param {Request} req - Express request object, expert ID in the params
+ * @param {Response} res - Express response object, returns expert or error
+ * @returns {Expert} 200 - Expert object
+ * @returns {Error} 401 - Unauthorized
+ * @returns {Error} 404 - Expert not found
+ * @returns {Error} 500 - Internal server error
+ */
+router.get("/user/expert/:id", async (req: Request, res: Response) => {
+  try {
+    const expert = await Expert.findById(req.params.id);
+    if (!expert) {
+      return res.status(404).json({ error: "Expert not found" });
+    }
+    res.status(200).json(expert);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * @route PUT /expert/:id
  * @description Update an expert by ID
  * @access Private
@@ -185,12 +208,10 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const requests = await ReschedulingRequest.find();
-      res
-        .status(200)
-        .json({
-          message: "Rescheduling requests retrieved successfully",
-          list: requests,
-        });
+      res.status(200).json({
+        message: "Rescheduling requests retrieved successfully",
+        list: requests,
+      });
     } catch (error) {
       res.status(500).json({ message: "Internal server error", error });
     }

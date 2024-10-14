@@ -90,7 +90,7 @@ paths:
           description: The ID of the expert
           schema:
             type: string
-            example: 615a4c4b8a1a2a001c0f21de
+            example: 66f7b215ec4690d3ae8d1d43
       responses:
         '200':
           description: A list of plans for the given expert ID
